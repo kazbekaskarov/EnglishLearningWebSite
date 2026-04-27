@@ -518,6 +518,167 @@ p, li { font-family: 'VT323', monospace; font-size: 22px; }
 .printable .file-meta { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--c-grape); }
 .printable p { font-size: 18px; }
 
+/* ============================================================
+   PRINTABLES — preview + print styles
+   ============================================================ */
+
+/* Hidden printable sheet (rendered off-screen unless printing) */
+.print-only {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 210mm;
+  background: #fff;
+  color: #111;
+  pointer-events: none;
+}
+
+/* Preview frame: in-page on-screen preview of the printable */
+.preview-wrap { width: 100%; }
+.preview-frame {
+  margin: 16px auto 0;
+  width: 100%;
+  max-width: 880px;
+  background: #fff;
+  color: #111;
+  border: 4px solid var(--c-void);
+  box-shadow: 4px 4px 0 var(--c-void), 8px 8px 0 var(--c-rose);
+  overflow: auto;
+}
+.preview-frame.paper-a4 { aspect-ratio: 1 / 1.414; }
+.preview-frame.paper-a3 { aspect-ratio: 1 / 1.414; max-width: 1100px; }
+.preview-frame.paper-a5 { aspect-ratio: 1 / 1.414; max-width: 600px; }
+.preview-frame.paper-a6 { aspect-ratio: 1 / 1.414; max-width: 420px; }
+
+/* Print sheet inner content */
+.print-sheet {
+  font-family: 'Inter', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+  color: #1a1c2c;
+  background: #fff;
+  padding: 12mm;
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.print-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  border-bottom: 3px solid #1a1c2c;
+  padding-bottom: 4mm; margin-bottom: 6mm;
+}
+.print-game { font-family: 'Press Start 2P', monospace; font-size: 14px; color: #b13e53; letter-spacing: 1px; }
+.print-sub { font-size: 12px; color: #444; margin-top: 2mm; max-width: 130mm; line-height: 1.4; }
+.print-stamp { font-family: 'Press Start 2P', monospace; font-size: 8px; border: 2px solid #1a1c2c; padding: 4px 6px; color: #1a1c2c; letter-spacing: 1px; }
+.print-body { flex: 1; }
+.print-foot { margin-top: 6mm; display: flex; justify-content: space-between; font-family: 'Press Start 2P', monospace; font-size: 8px; color: #888; letter-spacing: 1px; }
+
+.print-grid { display: grid; }
+
+.print-card { border: 3px dashed #1a1c2c; padding: 8mm 6mm; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 32mm; break-inside: avoid; }
+.print-card-sm { min-height: 24mm; padding: 5mm; }
+.print-card-lg { min-height: 50mm; }
+.print-card-title { font-family: 'Press Start 2P', monospace; font-size: 9px; color: #1a1c2c; letter-spacing: 2px; margin-bottom: 3mm; }
+.print-card-body { font-family: 'Inter', system-ui, sans-serif; }
+.big-word { font-family: 'Press Start 2P', monospace; font-size: 16px; color: #1a1c2c; margin-top: 2mm; }
+
+/* Banknotes */
+.banknote {
+  position: relative; height: 38mm;
+  border: 3px solid #1a1c2c;
+  background: repeating-linear-gradient(45deg, #f7eecf 0 4px, #efe5b5 4px 8px);
+  box-shadow: inset 0 0 0 2px #b89b3a;
+  display: flex; align-items: center; justify-content: center;
+  break-inside: avoid;
+}
+.bn-corner { position: absolute; font-family: 'Press Start 2P', monospace; font-size: 9px; color: #5a4216; background: rgba(255,255,255,0.5); padding: 1mm 2mm; }
+.bn-corner.tl { top: 2mm; left: 2mm; } .bn-corner.tr { top: 2mm; right: 2mm; }
+.bn-corner.bl { bottom: 2mm; left: 2mm; } .bn-corner.br { bottom: 2mm; right: 2mm; }
+.bn-word { font-family: 'Press Start 2P', monospace; font-size: 16px; color: #2a1f06; text-shadow: 1px 1px 0 rgba(184,155,58,0.8); }
+.bn-serial { position: absolute; bottom: 6mm; left: 0; right: 0; text-align: center; font-family: 'Courier New', monospace; font-size: 9px; color: #5a4216; letter-spacing: 2px; }
+
+/* Recipe cards */
+.recipe-card { border: 3px solid #1a1c2c; background: #fffaf0; padding: 6mm; min-height: 90mm; break-inside: avoid; position: relative; }
+.rc-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px dashed #1a1c2c; padding-bottom: 3mm; margin-bottom: 4mm; }
+.rc-head h3 { font-family: 'Press Start 2P', monospace; font-size: 13px; color: #b13e53; margin: 0; }
+.rc-flag { font-family: 'Press Start 2P', monospace; font-size: 8px; color: #555; padding: 2px 6px; border: 2px solid #1a1c2c; }
+.rc-section { margin-bottom: 4mm; }
+.rc-section strong { display: block; font-family: 'Press Start 2P', monospace; font-size: 9px; color: #29274c; margin-bottom: 2mm; letter-spacing: 1px; }
+.rc-section ul { list-style: none; padding: 0; }
+.rc-section li { font-size: 13px; padding: 1mm 0; }
+.rc-verbs { display: flex; gap: 2mm; flex-wrap: wrap; }
+.rc-verbs span { font-size: 12px; padding: 1mm 3mm; border: 2px solid #1a1c2c; background: #ffd070; }
+
+/* Ingredient cards */
+.ingredient-card { border: 2px solid #1a1c2c; background: #f0f8ff; padding: 4mm 3mm; text-align: center; min-height: 22mm; display: flex; flex-direction: column; justify-content: center; break-inside: avoid; }
+.ic-icon { font-size: 18px; color: #38b764; margin-bottom: 1mm; }
+.ic-word { font-family: 'Press Start 2P', monospace; font-size: 10px; color: #1a1c2c; }
+
+/* Cinema word table */
+.word-table { width: 100%; border-collapse: collapse; margin-bottom: 4mm; }
+.word-table th, .word-table td { border: 2px solid #1a1c2c; padding: 3mm; text-align: left; font-size: 12px; }
+.word-table th { background: #ffcd75; font-family: 'Press Start 2P', monospace; font-size: 9px; }
+.word-table .word-cell { font-family: 'Press Start 2P', monospace; font-size: 10px; color: #b13e53; width: 40mm; }
+.word-table .def-cell { background: repeating-linear-gradient(to bottom, transparent 0 6mm, #aaa 6mm calc(6mm + 1px)); height: 14mm; }
+.answers { font-size: 10px; color: #555; columns: 2; column-gap: 8mm; }
+.answers div { break-inside: avoid; padding: 1mm 0; }
+.answers b { color: #1a1c2c; font-family: 'Press Start 2P', monospace; font-size: 9px; }
+
+/* Academic board */
+.board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3mm; }
+.board-square { border: 3px solid #1a1c2c; padding: 4mm; min-height: 28mm; display: flex; flex-direction: column; justify-content: space-between; background: #fffaf0; break-inside: avoid; }
+.sq-num { font-family: 'Press Start 2P', monospace; font-size: 9px; color: #888; }
+.sq-label { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; }
+.sq-zone { background: #ffcd75; }
+.sq-event { background: #f4b4c5; }
+.sq-task { background: #a7f070; }
+.sq-start { background: #41a6f6; color: #fff; }
+.sq-finish { background: #b13e53; color: #fff; }
+.sq-finish .sq-num, .sq-start .sq-num { color: rgba(255,255,255,0.7); }
+
+/* Dossier */
+.dossier-grid { display: grid; grid-template-columns: 1fr; gap: 5mm; }
+.dossier { border: 3px solid #1a1c2c; background: #fffaf0; padding: 6mm; display: grid; grid-template-columns: 30mm 1fr; grid-template-rows: auto auto auto auto; gap: 3mm 5mm; position: relative; break-inside: avoid; }
+.dossier-photo { grid-row: 1 / 5; width: 30mm; height: 30mm; border: 3px solid #1a1c2c; background: #29274c; image-rendering: pixelated; }
+.dossier-photo svg { width: 100%; height: 100%; display: block; }
+.dossier-id { grid-column: 2; }
+.d-name { font-family: 'Press Start 2P', monospace; font-size: 14px; color: #b13e53; }
+.d-meta { font-size: 11px; color: #555; margin-top: 1mm; }
+.dossier-row { grid-column: 2; }
+.dossier-row b { font-family: 'Press Start 2P', monospace; font-size: 8px; color: #29274c; letter-spacing: 1px; }
+.dossier-row p { font-size: 12px; margin-top: 1mm; line-height: 1.4; }
+.dossier-row ul { list-style: none; padding-left: 0; margin-top: 1mm; font-size: 12px; line-height: 1.5; }
+.dossier-stamp { position: absolute; bottom: 4mm; right: 4mm; font-family: 'Press Start 2P', monospace; font-size: 9px; color: #b13e53; border: 3px solid #b13e53; padding: 1mm 3mm; transform: rotate(-6deg); letter-spacing: 1px; }
+
+/* Shopping */
+.shop-card { border: 3px solid #1a1c2c; background: #fff; padding: 4mm 3mm; text-align: center; min-height: 30mm; display: flex; flex-direction: column; justify-content: space-between; break-inside: avoid; }
+.shop-cat { font-family: 'Press Start 2P', monospace; font-size: 7px; color: #b13e53; letter-spacing: 1px; }
+.shop-word { font-family: 'Press Start 2P', monospace; font-size: 11px; color: #1a1c2c; }
+.shop-bar { height: 3mm; background: repeating-linear-gradient(90deg, #1a1c2c 0 1mm, transparent 1mm 2mm); }
+
+/* Pyramid */
+.pyramid { display: flex; flex-direction: column; align-items: center; gap: 4mm; margin-top: 4mm; }
+.pyr-row { display: flex; gap: 3mm; }
+.pyr-box { width: 32mm; height: 18mm; border: 3px solid #1a1c2c; background: #fffaf0; break-inside: avoid; }
+
+/* ============================================================
+   PRINT MEDIA QUERY — only the print-only sheet shows
+   ============================================================ */
+@media print {
+  @page { margin: 8mm; size: A4; }
+  body, html { background: #fff !important; }
+  body * { visibility: hidden !important; }
+  .print-only, .print-only * { visibility: visible !important; }
+  .print-only {
+    position: absolute !important;
+    left: 0 !important; top: 0 !important;
+    width: 100% !important; height: auto !important;
+  }
+  .crt-overlay, .marquee, .topbar, .footer { display: none !important; }
+  .print-sheet { box-shadow: none !important; padding: 0 !important; }
+  .print-foot { display: none !important; }
+  .print-only.paper-a3 { width: 100%; }
+}
+
 /* Footer */
 .footer { margin-top: auto; padding: 36px 0 20px; background: var(--c-void); border-top: var(--px) solid var(--c-rose); text-align: center; }
 .footer p { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--c-bone); margin: 6px 0; }
@@ -578,21 +739,6 @@ p, li { font-family: 'VT323', monospace; font-size: 22px; }
 .quote::after  { content: "❞"; bottom: 8px; right: 12px; }
 .quote p { font-family: 'Press Start 2P', monospace; font-size: 14px; color: var(--c-cream); line-height: 1.6; text-transform: uppercase; }
 .quote .author { display: block; margin-top: 18px; color: var(--c-leaf); font-size: 10px; }
-
-/* Floating star pixels in background */
-.starfield {
-  position: absolute; inset: 0; pointer-events: none; opacity: 0.5;
-  background-image:
-    radial-gradient(2px 2px at 25px 30px, var(--c-cream), transparent),
-    radial-gradient(2px 2px at 80px 90px, var(--c-sun), transparent),
-    radial-gradient(2px 2px at 160px 50px, var(--c-cream), transparent),
-    radial-gradient(2px 2px at 230px 130px, var(--c-pink), transparent),
-    radial-gradient(2px 2px at 310px 20px, var(--c-leaf), transparent);
-  background-size: 360px 180px;
-  background-repeat: repeat;
-  animation: twinkle 3s steps(3) infinite;
-}
-@keyframes twinkle { 50% { opacity: 0.25; } }
 
 /* small screens nav */
 @media (max-width: 720px) {

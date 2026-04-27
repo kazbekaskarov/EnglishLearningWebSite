@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { GAMES } from '../data/games'
+import { PRINTABLES, type Printable } from '../data/printables'
 import { PxArrow, PxClock, PxDice, PxPrinter, PxSpark, PxSpeaker } from '../components/PxIcon'
 
 type Tab = 'noise' | 'random' | 'timer' | 'flash' | 'print'
@@ -517,36 +518,72 @@ function defOf(w: string) { return MINI_DICT[w] ?? `(B1) ${w}` }
    PRINTABLES
    ============================================================ */
 function PrintTool() {
-  const items = [
-    { name: 'fast_cash_bills.pdf',  game: 'Fast Cash',        meta: 'A4 · 24 bills',  desc: '24 «купюры» с экономической лексикой для распечатки и расклейки.' },
-    { name: 'kitchen_recipes.pdf',  game: 'Kitchen Quest',    meta: 'A4 · 6 cards',   desc: 'Карточки блюд: Beshbarmak, Pasta with chicken, Plov, Lagman.' },
-    { name: 'kitchen_ingredients.pdf', game: 'Kitchen Quest', meta: 'A5 · 32 cards',  desc: 'Карточки продуктов для квеста по классу.' },
-    { name: 'gear_role_cards.pdf',  game: 'Guess Your Gear',  meta: 'A6 · 30 pairs',  desc: 'Парные карточки role/gear/place для лбного приклеивания.' },
-    { name: 'cinema_words.pdf',     game: 'Roll & Write',     meta: 'A4 · 1 sheet',   desc: 'Список киношных терминов для списка-стопера.' },
-    { name: 'academic_board.pdf',   game: 'Academic Journey', meta: 'A3 · 1 board',   desc: 'Игровое поле-бродилка от kindergarten до graduation.' },
-    { name: 'crime_dossier.pdf',    game: 'Case File X',      meta: 'A4 · 3 pages',   desc: 'Досье подозреваемых: Hugh Jass, Cruella la Grande, Jackie Bon.' },
-    { name: 'shopping_items.pdf',   game: 'Shopping Slap',    meta: 'A5 · 24 cards',  desc: 'Карточки товаров и категорий для шлепков.' },
-    { name: 'pyramid_template.pdf', game: 'Pyramid',          meta: 'A4 · 1 sheet',   desc: 'Пустой шаблон пирамиды для написания слов учителем.' },
-  ]
+  const [active, setActive] = useState<Printable | null>(null)
+
+  function doPrint(item: Printable) {
+    setActive(item)
+    // Wait for the DOM to render the print sheet, then trigger.
+    setTimeout(() => {
+      window.print()
+    }, 80)
+  }
+
+  // Listen to "afterprint" to clear the active sheet
+  useEffect(() => {
+    const handler = () => setActive(null)
+    window.addEventListener('afterprint', handler)
+    return () => window.removeEventListener('afterprint', handler)
+  }, [])
+
   return (
     <div className="col mt-6">
       <h3>▸ Printables</h3>
-      <p className="muted">Все материалы из Appendix хэндбука, готовые к печати. PDF откроются в новом окне.</p>
+      <p className="muted">
+        Все материалы из Appendix хэндбука, готовые к печати. Кнопка <b style={{ color: 'var(--c-sun)' }}>Print</b> открывает системный диалог
+        печати — выбери реальный принтер или «Save as PDF».
+      </p>
 
       <div className="printable-grid">
-        {items.map(it => (
-          <div key={it.name} className="printable">
+        {PRINTABLES.map(it => (
+          <div key={it.id} className="printable">
             <div className="file-header">
               <span className="file-name">{it.name}</span>
-              <span className="file-meta">{it.meta}</span>
+              <span className="file-meta">{it.paper} · {it.meta.split('·')[1]?.trim() ?? ''}</span>
             </div>
             <p style={{ marginBottom: 8 }}><b style={{ color: 'var(--c-grape)' }}>{it.game}</b></p>
             <p>{it.desc}</p>
-            <button className="pix-btn coral sm mt-4" onClick={() => alert(`Заглушка: PDF «${it.name}» скоро будет здесь.`)}>
-              <PxPrinter size={14} color="#1a1c2c" /> Print
-            </button>
+            <div className="row mt-4" style={{ gap: 8 }}>
+              <button className="pix-btn coral sm" onClick={() => doPrint(it)}>
+                <PxPrinter size={14} color="#1a1c2c" /> Print
+              </button>
+              <button className="pix-btn ghost sm" onClick={() => { setActive(it); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }) }}>
+                Preview
+              </button>
+            </div>
           </div>
         ))}
+      </div>
+
+      {active && (
+        <div className="preview-wrap mt-8">
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <h3>▸ Preview · {active.name}</h3>
+            <div className="row">
+              <button className="pix-btn sm" onClick={() => doPrint(active)}>
+                <PxPrinter size={14} color="#1a1c2c" /> Print this
+              </button>
+              <button className="pix-btn ghost sm" onClick={() => setActive(null)}>Close</button>
+            </div>
+          </div>
+          <div className={`preview-frame paper-${active.paper.toLowerCase()}`}>
+            {active.render()}
+          </div>
+        </div>
+      )}
+
+      {/* Hidden printable area — only visible during print */}
+      <div className={`print-only paper-${active?.paper.toLowerCase() ?? 'a4'}`} aria-hidden="true">
+        {active?.render()}
       </div>
     </div>
   )

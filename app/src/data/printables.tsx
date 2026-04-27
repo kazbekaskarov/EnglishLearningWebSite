@@ -1,0 +1,422 @@
+import type { ReactNode } from 'react'
+
+/* ============================================================
+   Printable templates for the Classroom Manager.
+   Each renderer returns layout-ready JSX styled for A4/A5/A3.
+   ============================================================ */
+
+export interface Printable {
+  id: string
+  name: string
+  game: string
+  meta: string
+  desc: string
+  paper: 'A4' | 'A5' | 'A3' | 'A6'
+  render: () => ReactNode
+}
+
+/* ---------- helpers ---------- */
+const Sheet: React.FC<{ children: ReactNode; title: string; subtitle?: string }> = ({ children, title, subtitle }) => (
+  <div className="print-sheet">
+    <header className="print-head">
+      <div>
+        <div className="print-game">★ {title}</div>
+        {subtitle && <div className="print-sub">{subtitle}</div>}
+      </div>
+      <div className="print-stamp">ENGAGE.exe · v1.0</div>
+    </header>
+    <div className="print-body">{children}</div>
+    <footer className="print-foot">
+      <span>cut along ⤵</span>
+      <span>—————————————————————————————————</span>
+      <span>cut along ⤴</span>
+    </footer>
+  </div>
+)
+
+const Card: React.FC<{
+  children: ReactNode
+  size?: 'sm' | 'md' | 'lg'
+  color?: string
+  title?: string
+}> = ({ children, size = 'md', color = '#ffcd75', title }) => (
+  <div className={`print-card print-card-${size}`} style={{ background: color }}>
+    {title && <div className="print-card-title">{title}</div>}
+    <div className="print-card-body">{children}</div>
+  </div>
+)
+
+/* ---------- 1) FAST CASH BILLS ---------- */
+const cashWords = [
+  ['MORTGAGE', '$500'], ['LOAN', '$250'], ['SALARY', '$1000'], ['REFUND', '$50'],
+  ['DEBT', '$200'], ['INCOME', '$1500'], ['TAX', '$100'], ['DEPOSIT', '$300'],
+  ['CASH', '$20'], ['CURRENCY', '$100'], ['INVOICE', '$80'], ['INVESTMENT', '$2000'],
+  ['BUDGET', '$500'], ['EXPENSE', '$150'], ['SAVINGS', '$700'], ['INTEREST', '$45'],
+  ['BANKRUPT', '$0'], ['PROFIT', '$900'], ['BILL', '$60'], ['CHANGE', '$5'],
+  ['DISCOUNT', '$15'], ['FEE', '$25'], ['PAYMENT', '$400'], ['WAGE', '$800'],
+]
+const fastCashBills: Printable = {
+  id: 'fast_cash_bills',
+  name: 'fast_cash_bills.pdf',
+  game: 'Fast Cash',
+  meta: 'A4 · 24 bills',
+  paper: 'A4',
+  desc: '24 «купюры» с экономической лексикой для распечатки и расклейки.',
+  render: () => (
+    <Sheet title="Fast Cash · Banknotes" subtitle="Cut and stick around the classroom. Players grab the matching bill on cue.">
+      <div className="print-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '10mm' }}>
+        {cashWords.map(([w, v], i) => (
+          <div key={w} className="banknote">
+            <div className="bn-corner tl">{v}</div>
+            <div className="bn-corner tr">{v}</div>
+            <div className="bn-corner bl">{v}</div>
+            <div className="bn-corner br">{v}</div>
+            <div className="bn-word">{w}</div>
+            <div className="bn-serial">№ {String(i + 1).padStart(3, '0')} · ENGAGE BANK</div>
+          </div>
+        ))}
+      </div>
+    </Sheet>
+  ),
+}
+
+/* ---------- 2) KITCHEN RECIPES ---------- */
+const recipes = [
+  { name: 'Beshbarmak',         from: 'Kazakhstan', items: ['horse meat', 'onion', 'noodle dough', 'broth', 'parsley'], verbs: ['boil', 'slice', 'simmer', 'serve'] },
+  { name: 'Pasta with Chicken', from: 'Italy',      items: ['pasta', 'chicken breast', 'cream', 'garlic', 'parmesan'], verbs: ['fry', 'whisk', 'simmer', 'mix'] },
+  { name: 'Plov',               from: 'Uzbekistan', items: ['rice', 'lamb', 'carrot', 'onion', 'cumin'],               verbs: ['fry', 'add', 'simmer', 'rest'] },
+  { name: 'Lagman',             from: 'Central Asia', items: ['noodles', 'beef', 'pepper', 'tomato', 'spices'],         verbs: ['stir-fry', 'boil', 'pour', 'sprinkle'] },
+  { name: 'Mushroom Risotto',   from: 'Italy',      items: ['arborio rice', 'mushrooms', 'onion', 'butter', 'broth'],   verbs: ['stir', 'add', 'simmer', 'taste'] },
+  { name: 'Caesar Salad',       from: 'USA',        items: ['lettuce', 'croutons', 'parmesan', 'chicken', 'dressing'],   verbs: ['chop', 'toss', 'grate', 'plate'] },
+]
+const kitchenRecipes: Printable = {
+  id: 'kitchen_recipes',
+  name: 'kitchen_recipes.pdf',
+  game: 'Kitchen Quest',
+  meta: 'A4 · 6 cards',
+  paper: 'A4',
+  desc: 'Карточки блюд для команд: название блюда + список ингредиентов + глаголы готовки.',
+  render: () => (
+    <Sheet title="Kitchen Quest · Recipe Cards" subtitle="Hand one card per team. They must hunt the ingredients and assemble the recipe.">
+      <div className="print-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8mm' }}>
+        {recipes.map(r => (
+          <div key={r.name} className="recipe-card">
+            <div className="rc-head">
+              <h3>{r.name}</h3>
+              <span className="rc-flag">{r.from}</span>
+            </div>
+            <div className="rc-section">
+              <strong>Ingredients</strong>
+              <ul>{r.items.map(it => <li key={it}>☐ {it}</li>)}</ul>
+            </div>
+            <div className="rc-section">
+              <strong>Cooking verbs</strong>
+              <div className="rc-verbs">{r.verbs.map(v => <span key={v}>{v}</span>)}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Sheet>
+  ),
+}
+
+/* ---------- 3) KITCHEN INGREDIENTS (32 small cards) ---------- */
+const ingredients = [
+  'horse meat', 'onion', 'mushroom', 'cream', 'garlic', 'butter', 'rice', 'pasta',
+  'lamb', 'carrot', 'pepper', 'tomato', 'beef', 'noodles', 'cumin', 'parsley',
+  'lettuce', 'parmesan', 'croutons', 'chicken', 'broth', 'arborio rice', 'spices', 'dough',
+  'sugar', 'salt', 'oil', 'flour', 'egg', 'milk', 'cheese', 'lemon',
+]
+const kitchenIngredients: Printable = {
+  id: 'kitchen_ingredients',
+  name: 'kitchen_ingredients.pdf',
+  game: 'Kitchen Quest',
+  meta: 'A4 · 32 cards',
+  paper: 'A4',
+  desc: 'Маленькие карточки продуктов — спрятать по классу для квеста.',
+  render: () => (
+    <Sheet title="Kitchen Quest · Ingredients" subtitle="Cut and hide around the classroom. Teams must find the right ones for their recipe.">
+      <div className="print-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '4mm' }}>
+        {ingredients.map(i => (
+          <div key={i} className="ingredient-card">
+            <div className="ic-icon">▣</div>
+            <div className="ic-word">{i}</div>
+          </div>
+        ))}
+      </div>
+    </Sheet>
+  ),
+}
+
+/* ---------- 4) GEAR ROLE CARDS ---------- */
+const gearPairs: [string, string, string][] = [
+  ['Tennis player', 'Racket', 'Court'],
+  ['Footballer', 'Ball', 'Stadium'],
+  ['Swimmer', 'Goggles', 'Pool'],
+  ['Boxer', 'Gloves', 'Ring'],
+  ['Skier', 'Skis', 'Slope'],
+  ['Cyclist', 'Helmet', 'Track'],
+  ['Goalkeeper', 'Gloves', 'Goal'],
+  ['Coach', 'Whistle', 'Bench'],
+  ['Referee', 'Whistle', 'Pitch'],
+  ['Spectator', 'Ticket', 'Stand'],
+]
+const gearRoleCards: Printable = {
+  id: 'gear_role_cards',
+  name: 'gear_role_cards.pdf',
+  game: 'Guess Your Gear',
+  meta: 'A4 · 30 cards',
+  paper: 'A4',
+  desc: 'Карточки role/gear/place для приклеивания на спину.',
+  render: () => (
+    <Sheet title="Guess Your Gear · Role Cards" subtitle="Stick one card on each student's back. They use Yes/No questions to discover their identity.">
+      <div className="print-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '6mm' }}>
+        {gearPairs.flatMap(([a, b, c]) => [
+          { label: 'ROLE',  word: a, color: '#ffcd75' },
+          { label: 'GEAR',  word: b, color: '#a7f070' },
+          { label: 'PLACE', word: c, color: '#73eff7' },
+        ]).map((card, i) => (
+          <Card key={i} color={card.color} size="md">
+            <div style={{ fontSize: 9, letterSpacing: 2, opacity: 0.7 }}>{card.label}</div>
+            <div className="big-word">{card.word}</div>
+          </Card>
+        ))}
+      </div>
+    </Sheet>
+  ),
+}
+
+/* ---------- 5) CINEMA WORDS ---------- */
+const cinemaWords = [
+  ['plot',       'main story of a film'],
+  ['sequel',     'a film that follows another'],
+  ['soundtrack', 'music from a film'],
+  ['cast',       'all actors in a film'],
+  ['director',   'person who leads a film'],
+  ['script',     'written text of a film'],
+  ['trailer',    'short ad for a film'],
+  ['review',     'a critic\'s opinion'],
+  ['genre',      'category of film'],
+  ['actor',      'person who plays a role'],
+  ['scene',      'one part of a film'],
+  ['cinematography', 'art of filming'],
+]
+const cinemaList: Printable = {
+  id: 'cinema_words',
+  name: 'cinema_words.pdf',
+  game: 'Roll & Write',
+  meta: 'A4 · 1 sheet',
+  paper: 'A4',
+  desc: 'Список киношных терминов для Roll & Write.',
+  render: () => (
+    <Sheet title="Roll & Write · Cinema Vocabulary" subtitle="Roll a die. On 5 or 6, grab the pen and start writing definitions.">
+      <table className="word-table">
+        <thead><tr><th>#</th><th>Word</th><th>Your definition</th></tr></thead>
+        <tbody>
+          {cinemaWords.map(([w], i) => (
+            <tr key={w}><td>{i + 1}</td><td className="word-cell">{w}</td><td className="def-cell"></td></tr>
+          ))}
+        </tbody>
+      </table>
+      <p style={{ marginTop: '6mm', fontSize: 11 }}>Hidden answers (for the teacher only):</p>
+      <div className="answers">
+        {cinemaWords.map(([w, d]) => <div key={w}><b>{w}</b> — {d}</div>)}
+      </div>
+    </Sheet>
+  ),
+}
+
+/* ---------- 6) ACADEMIC BOARD ---------- */
+const academicSquares = [
+  { label: 'START · Kindergarten', kind: 'start' },
+  { label: 'Make a friend',         kind: 'task' },
+  { label: 'Primary school',        kind: 'zone' },
+  { label: 'OVERSLEPT! ← back 2',   kind: 'event' },
+  { label: 'Name 3 subjects',       kind: 'task' },
+  { label: 'School trip → +1',      kind: 'event' },
+  { label: 'Secondary school',      kind: 'zone' },
+  { label: 'Pass the exam',         kind: 'task' },
+  { label: 'CAUGHT CHEATING (skip turn)', kind: 'event' },
+  { label: 'Win a scholarship → +2', kind: 'event' },
+  { label: 'College',               kind: 'zone' },
+  { label: 'Name 3 majors',         kind: 'task' },
+  { label: 'Failed an exam ← back 1', kind: 'event' },
+  { label: 'Internship → +1',       kind: 'event' },
+  { label: 'University',            kind: 'zone' },
+  { label: 'Defend your thesis',    kind: 'task' },
+  { label: 'Drop out ← back 3',     kind: 'event' },
+  { label: 'Get your degree',       kind: 'task' },
+  { label: 'GRADUATION SPEECH',     kind: 'finish' },
+]
+const academicBoard: Printable = {
+  id: 'academic_board',
+  name: 'academic_board.pdf',
+  game: 'Academic Journey',
+  meta: 'A3 · 1 board',
+  paper: 'A3',
+  desc: 'Игровое поле-бродилка от kindergarten до graduation.',
+  render: () => (
+    <Sheet title="Academic Journey · Game Board" subtitle="Roll a die, complete tasks, survive events. The first to deliver a graduation speech wins.">
+      <div className="board">
+        {academicSquares.map((sq, i) => (
+          <div key={i} className={`board-square sq-${sq.kind}`}>
+            <div className="sq-num">{String(i + 1).padStart(2, '0')}</div>
+            <div className="sq-label">{sq.label}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: '4mm', fontSize: 11 }}>
+        <b>Legend:</b> ⬛ task · ◆ event · ▶ start · ★ finish &nbsp;·&nbsp; bring tokens & a die.
+      </div>
+    </Sheet>
+  ),
+}
+
+/* ---------- 7) CRIME DOSSIERS ---------- */
+const suspects = [
+  {
+    name: 'Hugh Jass', role: 'Security Guard', age: 47,
+    photo: 'guard',
+    alibi: '"I was on patrol in Wing C between 22:00 and 23:30."',
+    motive: 'Was passed over for promotion last year. Holds a grudge against the curator.',
+    evidence: ['Master keys to all halls', 'Reported stomach ache, left post early', 'No camera footage 22:45–22:53'],
+  },
+  {
+    name: 'Cruella la Grande', role: 'Art Historian', age: 58,
+    photo: 'historian',
+    alibi: '"I was giving a lecture in Hall 12. Forty witnesses, darling."',
+    motive: 'Believes the painting is a forgery and "deserves to disappear".',
+    evidence: ['Recently published article calling the work "fake"', 'Has gloves matching fibers found at the scene', 'Lecture ended at 22:00 — 53 unaccounted minutes'],
+  },
+  {
+    name: 'Jackie Bon', role: 'Cleaner', age: 31,
+    photo: 'cleaner',
+    alibi: '"I was emptying bins in the Egyptian section."',
+    motive: 'Massive student loan. Was seen browsing dark-web forums.',
+    evidence: ['Cleaning cart found near the empty frame', 'Wears size-9 shoes — matches print', 'Searched "how to forge ID" on a museum computer'],
+  },
+]
+const crimeDossier: Printable = {
+  id: 'crime_dossier',
+  name: 'crime_dossier.pdf',
+  game: 'Case File X',
+  meta: 'A4 · 3 pages',
+  paper: 'A4',
+  desc: 'Досье подозреваемых для детективного расследования.',
+  render: () => (
+    <Sheet title="Case File X · Suspect Dossiers" subtitle="A painting has vanished from the Louvre. Three suspects. One thief. Find them.">
+      <div className="dossier-grid">
+        {suspects.map(s => (
+          <div key={s.name} className="dossier">
+            <div className="dossier-photo">{photoArt(s.photo)}</div>
+            <div className="dossier-id">
+              <div className="d-name">{s.name}</div>
+              <div className="d-meta">{s.role} · age {s.age}</div>
+            </div>
+            <div className="dossier-row"><b>ALIBI</b><p>{s.alibi}</p></div>
+            <div className="dossier-row"><b>MOTIVE</b><p>{s.motive}</p></div>
+            <div className="dossier-row"><b>EVIDENCE</b>
+              <ul>{s.evidence.map(e => <li key={e}>· {e}</li>)}</ul>
+            </div>
+            <div className="dossier-stamp">CONFIDENTIAL</div>
+          </div>
+        ))}
+      </div>
+    </Sheet>
+  ),
+}
+
+function photoArt(kind: string) {
+  /* Tiny pixel-art portrait per role */
+  const colors = kind === 'guard'    ? ['#29274c', '#41a6f6']
+              : kind === 'historian' ? ['#5d275d', '#b13e53']
+              :                        ['#257179', '#a7f070']
+  return (
+    <svg viewBox="0 0 16 16" shapeRendering="crispEdges" width="100%" height="100%">
+      <rect width="16" height="16" fill={colors[0]} />
+      <rect x="5" y="3" width="6" height="6" fill="#ffcd75" />
+      <rect x="4" y="9" width="8" height="6" fill={colors[1]} />
+      <rect x="6" y="5" width="1" height="1" fill="#0f1020" />
+      <rect x="9" y="5" width="1" height="1" fill="#0f1020" />
+      <rect x="6" y="7" width="4" height="1" fill="#0f1020" />
+      <rect x="4" y="3" width="8" height="1" fill="#0f1020" />
+    </svg>
+  )
+}
+
+/* ---------- 8) SHOPPING ITEMS ---------- */
+const shoppingItems = [
+  { word: 'receipt',  cat: 'document' }, { word: 'refund',   cat: 'service' },
+  { word: 'discount', cat: 'service'  }, { word: 'sale',     cat: 'service' },
+  { word: 'cashier',  cat: 'person'   }, { word: 'aisle',    cat: 'place'   },
+  { word: 'warranty', cat: 'document' }, { word: 'bargain',  cat: 'service' },
+  { word: 'retail',   cat: 'concept'  }, { word: 'exchange', cat: 'service' },
+  { word: 'queue',    cat: 'concept'  }, { word: 'trolley',  cat: 'object'  },
+  { word: 'till',     cat: 'object'   }, { word: 'tag',      cat: 'object'  },
+  { word: 'shelf',    cat: 'place'    }, { word: 'basket',   cat: 'object'  },
+  { word: 'voucher',  cat: 'document' }, { word: 'brand',    cat: 'concept' },
+  { word: 'expired',  cat: 'concept'  }, { word: 'return',   cat: 'service' },
+  { word: 'bargain hunter', cat: 'person' }, { word: 'bag',  cat: 'object'  },
+  { word: 'change',   cat: 'object'   }, { word: 'price tag', cat: 'object' },
+]
+const shoppingCards: Printable = {
+  id: 'shopping_items',
+  name: 'shopping_items.pdf',
+  game: 'Shopping Slap',
+  meta: 'A4 · 24 cards',
+  paper: 'A4',
+  desc: 'Карточки товаров и категорий для шлепков.',
+  render: () => (
+    <Sheet title="Shopping Slap · Item Cards" subtitle="Place face-up on the table. Players slap the matching card on cue.">
+      <div className="print-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '5mm' }}>
+        {shoppingItems.map(it => (
+          <div key={it.word} className="shop-card">
+            <div className="shop-cat">{it.cat.toUpperCase()}</div>
+            <div className="shop-word">{it.word}</div>
+            <div className="shop-bar" />
+          </div>
+        ))}
+      </div>
+    </Sheet>
+  ),
+}
+
+/* ---------- 9) PYRAMID ---------- */
+const pyramidTemplate: Printable = {
+  id: 'pyramid_template',
+  name: 'pyramid_template.pdf',
+  game: 'Pyramid',
+  meta: 'A4 · 1 sheet',
+  paper: 'A4',
+  desc: 'Пустой шаблон пирамиды для написания слов учителем.',
+  render: () => (
+    <Sheet title="Pyramid · Blank Template" subtitle="Write one word per box. Player A describes from bottom to top, player B guesses with their back turned.">
+      <div className="pyramid">
+        {[5, 4, 3, 2, 1].map(n => (
+          <div key={n} className="pyr-row">
+            {Array.from({ length: n }).map((_, i) => (
+              <div key={i} className="pyr-box"></div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <p style={{ marginTop: '6mm', textAlign: 'center', fontSize: 13 }}>
+        Reach the top → shout "<b>PYRAMID!</b>"
+      </p>
+    </Sheet>
+  ),
+}
+
+/* ---------- REGISTRY ---------- */
+export const PRINTABLES: Printable[] = [
+  fastCashBills,
+  kitchenRecipes,
+  kitchenIngredients,
+  gearRoleCards,
+  cinemaList,
+  academicBoard,
+  crimeDossier,
+  shoppingCards,
+  pyramidTemplate,
+]
+
