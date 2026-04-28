@@ -767,64 +767,75 @@ p, li { font-family: 'VT323', monospace; font-size: 22px; }
 .quote p { font-family: 'Press Start 2P', monospace; font-size: 14px; color: var(--c-cream); line-height: 1.6; text-transform: uppercase; }
 .quote .author { display: block; margin-top: 18px; color: var(--c-leaf); font-size: 10px; }
 
-/* ============================================================
-   BURGER (mobile-only nav) — hidden on desktop
-   ============================================================ */
+/* Burger button (hidden on desktop) */
 .burger {
   display: none;
-  width: 40px; height: 40px;
+  width: 44px; height: 44px;
+  padding: 0;
   background: var(--c-night);
   border: 2px solid var(--c-cream);
   box-shadow: 3px 3px 0 var(--c-rose);
-  padding: 0;
   cursor: pointer;
+  position: relative;
+  z-index: 120;
 }
 .burger span {
   display: block;
-  width: 20px; height: 3px;
+  width: 22px; height: 3px;
+  margin: 4px auto;
   background: var(--c-sun);
-  margin: 3px auto;
+  transition: transform 120ms steps(2), opacity 120ms steps(2);
 }
-.topbar.is-open .burger span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-.topbar.is-open .burger span:nth-child(2) { opacity: 0; }
-.topbar.is-open .burger span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+.burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.burger.open span:nth-child(2) { opacity: 0; }
+.burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.nav-mobile-extras { display: none; }
+.nav-backdrop { display: none; }
 
-.menu-backdrop {
-  position: fixed; inset: 0;
-  background: rgba(15, 16, 32, 0.7);
-  z-index: 90;
-}
-
+/* small screens nav */
 @media (max-width: 720px) {
-  .burger { display: grid; place-items: center; }
+  .topbar-stats { display: none; }
+  .burger { display: block; }
 
-  .topbar-drawer {
+  .nav {
     position: fixed;
-    top: 64px; left: 0; right: 0;
-    max-height: calc(100vh - 64px);
-    overflow-y: auto;
-    background: var(--c-void);
-    border-bottom: var(--px) solid var(--c-cream);
-    box-shadow: 0 var(--px) 0 var(--c-rose);
-    transform: translateY(-110%);
-    transition: transform 0.15s steps(3);
-    z-index: 95;
-    padding: 16px;
-    display: flex; flex-direction: column; gap: 16px;
-  }
-  .topbar-drawer.is-open { transform: translateY(0); }
-
-  .nav { flex-direction: column; gap: 6px; align-items: stretch; }
-  .nav a { padding: 12px 14px; font-size: 11px; text-align: center; }
-  .topbar-stats {
+    top: 0; right: 0;
+    height: 100vh;
+    width: min(78vw, 320px);
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
-    padding-top: 12px;
+    gap: 4px;
+    padding: 88px 20px 24px;
+    background: var(--c-void);
+    border-left: var(--px) solid var(--c-cream);
+    box-shadow: -6px 0 0 var(--c-rose);
+    transform: translateX(110%);
+    transition: transform 160ms steps(4);
+    z-index: 110;
+    overflow-y: auto;
+  }
+  .nav.open { transform: translateX(0); }
+  .nav a {
+    display: block;
+    padding: 14px 12px;
+    font-size: 12px;
+    border: 2px solid var(--c-deep);
+  }
+  .nav a.active { box-shadow: 3px 3px 0 var(--c-rose); }
+  .nav-mobile-extras {
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+    padding-top: 18px;
     border-top: 2px dashed var(--c-shadow);
   }
-  .lang-switch { justify-content: center; }
-  .hp { justify-content: center; }
+  .nav-backdrop {
+    display: block;
+    position: fixed; inset: 0;
+    background: rgba(15, 16, 32, 0.7);
+    z-index: 105;
+  }
+  .brand-name { font-size: 11px; }
 }
 
 /* ============================================================
