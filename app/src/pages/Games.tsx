@@ -2,43 +2,56 @@ import { Link } from 'react-router-dom'
 import { useMemo, useState } from 'react'
 import { GAMES, type Game } from '../data/games'
 import { getScene } from '../components/scenes'
-
-const FILTERS: { key: string; label: string; test: (g: Game) => boolean }[] = [
-  { key: 'all',   label: 'ALL',          test: () => true },
-  { key: 'team',  label: 'TEAM',         test: g => g.kind === 'team' },
-  { key: 'pair',  label: 'PAIR',         test: g => g.kind === 'pair' },
-  { key: 'whole', label: 'WHOLE CLASS',  test: g => g.kind === 'whole-class' },
-  { key: 'short', label: 'SHORT (≤15)',  test: g => g.duration === 'short' },
-  { key: 'long',  label: 'LONG (20+)',   test: g => g.duration === 'long' },
-]
+import { useLang, useT } from '../i18n/I18n'
 
 export default function Games() {
+  const t = useT()
+  const lang = useLang()
   const [filter, setFilter] = useState('all')
   const [query, setQuery] = useState('')
 
+  const FILTERS: { key: string; label: string; test: (g: Game) => boolean }[] = [
+    { key: 'all',   label: t('games.f.all'),   test: () => true },
+    { key: 'team',  label: t('games.f.team'),  test: g => g.kind === 'team' },
+    { key: 'pair',  label: t('games.f.pair'),  test: g => g.kind === 'pair' },
+    { key: 'whole', label: t('games.f.whole'), test: g => g.kind === 'whole-class' },
+    { key: 'short', label: t('games.f.short'), test: g => g.duration === 'short' },
+    { key: 'long',  label: t('games.f.long'),  test: g => g.duration === 'long' },
+  ]
+
   const filtered = useMemo(() => {
     const f = FILTERS.find(x => x.key === filter)!.test
+    const q = query.toLowerCase()
     return GAMES.filter(g =>
       f(g) &&
-      (g.title.toLowerCase().includes(query.toLowerCase()) ||
-        g.topic.toLowerCase().includes(query.toLowerCase()) ||
-        g.vocabulary.some(v => v.includes(query.toLowerCase())))
+      (g.title.toLowerCase().includes(q) ||
+        g.topic.toLowerCase().includes(q) ||
+        g.vocabulary.some(v => v.includes(q)))
     )
-  }, [filter, query])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, query, lang])
+
+  function kindLabel(k: Game['kind']) {
+    return k === 'team' ? t('games.kind.team') :
+           k === 'pair' ? t('games.kind.pair') :
+           k === 'solo' ? t('games.kind.solo') :
+                          t('games.kind.whole')
+  }
+  function kindClass(k: Game['kind']) {
+    return k === 'team' ? 'pink' : k === 'pair' ? 'sky' : k === 'solo' ? 'green' : 'coral'
+  }
 
   return (
     <section className="section">
       <div className="container">
-        <span className="section-eyebrow">SELECT MISSION · 15 / 15</span>
-        <h1>Game Library</h1>
-        <p className="muted mt-4" style={{ maxWidth: 640 }}>
-          Каждая «игра» — это самодостаточный модуль урока. Кликай по картриджу чтобы получить полный сценарий, лексику и таймер.
-        </p>
+        <span className="section-eyebrow">{t('games.eyebrow')}</span>
+        <h1>{t('games.title')}</h1>
+        <p className="muted mt-4" style={{ maxWidth: 640 }}>{t('games.sub')}</p>
 
         <div className="row mt-8" style={{ alignItems: 'stretch' }}>
           <input
             className="pix-input"
-            placeholder="search by title, topic or word..."
+            placeholder={t('games.search')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             style={{ maxWidth: 360 }}
@@ -66,13 +79,13 @@ export default function Games() {
               </div>
               <div className="game-card-body">
                 <div className="row" style={{ justifyContent: 'space-between' }}>
-                  <span className="game-card-no">QUEST #{g.number}</span>
+                  <span className="game-card-no">{t('detail.quest')} #{g.number}</span>
                   <span className="tag green">{g.durationMin}</span>
                 </div>
                 <div className="game-card-title">{g.title}</div>
-                <div className="game-card-topic">{g.topic} · {g.tagline}</div>
+                <div className="game-card-topic">{g.topic} · {g.tagline[lang]}</div>
                 <div className="game-card-meta">
-                  <span className={`tag ${kindClass(g.kind)}`}>{labelKind(g.kind)}</span>
+                  <span className={`tag ${kindClass(g.kind)}`}>{kindLabel(g.kind)}</span>
                   <span className="tag rose">DIFF {'★'.repeat(g.difficulty)}</span>
                 </div>
               </div>
@@ -82,12 +95,5 @@ export default function Games() {
       </div>
     </section>
   )
-}
-
-function kindClass(k: Game['kind']) {
-  return k === 'team' ? 'pink' : k === 'pair' ? 'sky' : k === 'solo' ? 'green' : 'coral'
-}
-function labelKind(k: Game['kind']) {
-  return k === 'team' ? 'TEAM' : k === 'pair' ? 'PAIR' : k === 'solo' ? 'SOLO' : 'WHOLE CLASS'
 }
 

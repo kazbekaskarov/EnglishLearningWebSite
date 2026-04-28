@@ -1,7 +1,18 @@
 import { NavLink, Link } from 'react-router-dom'
 import { PxController, PxHeart, PxStar } from './PxIcon'
+import { LangSwitcher, useT } from '../i18n/I18n'
+
+const AUTHORS = [
+  'Assel Mengdulla',
+  'Symbat Azamatkyzy',
+  'Amina Kozykhanova',
+  'Zhanaiym Kozhantay',
+  'Dilnaz Galymova',
+]
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const t = useT()
+
   return (
     <div className="shell">
       <header className="topbar">
@@ -16,13 +27,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </Link>
 
           <nav className="nav">
-            <NavLink to="/" end>Start</NavLink>
-            <NavLink to="/games">Games</NavLink>
-            <NavLink to="/manager">Manager</NavLink>
-            <NavLink to="/about">About</NavLink>
+            <NavLink to="/" end>{t('nav.start')}</NavLink>
+            <NavLink to="/games">{t('nav.games')}</NavLink>
+            <NavLink to="/manager">{t('nav.manager')}</NavLink>
+            <NavLink to="/about">{t('nav.about')}</NavLink>
           </nav>
 
           <div className="topbar-stats">
+            <LangSwitcher />
             <div className="hp" title="Player HP">
               <PxHeart size={16} />
               <div className="hp-track"><div className="hp-fill" style={{ width: '78%' }} /></div>
@@ -40,21 +52,38 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <div className="marquee">
         <div className="marquee-track">
-          <span>★</span> ENGAGE ME AND I LEARN
-          <span>★</span> 15 GAMES · B1 LEVEL · CEFR
-          <span>★</span> NO BORING DRILLS
-          <span>★</span> POWERED BY PIXELS
-          <span>★</span> ENGAGE ME AND I LEARN
-          <span>★</span> 15 GAMES · B1 LEVEL · CEFR
-          <span>★</span> NO BORING DRILLS
-          <span>★</span> POWERED BY PIXELS
+          <span>★</span> {t('marquee.1')}
+          <span>★</span> {t('marquee.2')}
+          <span>★</span> {t('marquee.3')}
+          <span>★</span> {t('marquee.4')}
+          <span>★</span> {t('marquee.1')}
+          <span>★</span> {t('marquee.2')}
+          <span>★</span> {t('marquee.3')}
+          <span>★</span> {t('marquee.4')}
         </div>
       </div>
 
       <footer className="footer">
         <div className="container">
-          <p>ENGAGE.EXE · v1.0 · MADE WITH <span className="heart">♥</span> & PIXELS</p>
-          <p style={{ color: 'var(--c-shadow)' }}>© 2026 — A COMPANION TO «GAMIFICATION: B1 VOCABULARY HANDBOOK FOR TEACHERS»</p>
+          <p className="footer-tagline">
+            ENGAGE.EXE · v1.0 · {t('footer.tagline')} <span className="heart">♥</span> {t('footer.and')}
+          </p>
+
+          <div className="footer-divider">▸ {t('footer.authors')} ◂</div>
+
+          <ul className="footer-authors">
+            {AUTHORS.map((a, i) => (
+              <li key={a}>
+                <span className="author-num">{String(i + 1).padStart(2, '0')}</span>
+                <span className="author-name">{a}</span>
+              </li>
+            ))}
+          </ul>
+
+          <p className="footer-rights">
+            © 2026 · {t('footer.rights')}
+          </p>
+          <p style={{ color: 'var(--c-shadow)', fontSize: 8 }}>{t('footer.companion')}</p>
         </div>
       </footer>
 
