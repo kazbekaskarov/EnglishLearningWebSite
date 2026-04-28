@@ -153,6 +153,9 @@ export const T: Dict = {
   'noise.label':  { en: 'NOISE',              ru: 'ШУМ',              kk: 'ШУ',             tr: 'GÜRÜLTÜ' },
   'noise.desc':   { en: 'Bubbles rise with the classroom noise level. When it gets too loud, the indicator turns red.', ru: 'Шарики поднимаются по уровню звука. Когда становится «too loud» — индикатор краснеет.', kk: 'Шарлар сынып шуының деңгейіне қарай көтеріледі. Тым қатты болса — индикатор қызарады.', tr: 'Baloncuklar sınıfın gürültü düzeyine göre yükselir. Çok yüksek olduğunda — gösterge kırmızıya döner.' },
   'noise.error':  { en: 'Microphone unavailable. You can try Demo mode.', ru: 'Микрофон недоступен. Можно включить Demo-режим.', kk: 'Микрофон қолжетімсіз. Demo режимін қосуға болады.', tr: 'Mikrofon kullanılamıyor. Demo modunu deneyebilirsiniz.' },
+  'noise.sens':   { en: 'SENS',  ru: 'ЧУВСТ',  kk: 'СЕЗГ',   tr: 'HASS' },
+  'noise.wide':   { en: '⤢ Widescreen', ru: '⤢ Широкий экран', kk: '⤢ Кең экран', tr: '⤢ Geniş Ekran' },
+  'noise.dock':   { en: '⤡ Dock',       ru: '⤡ Свернуть',     kk: '⤡ Жинау',     tr: '⤡ Sabitle' },
 
   /* ----- Random ----- */
   'random.title': { en: '▸ Team Randomizer', ru: '▸ Рандомайзер команд', kk: '▸ Команда рандомайзері', tr: '▸ Takım Rastgele Atıcı' },

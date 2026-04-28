@@ -1,5 +1,5 @@
 import { Link, useParams, useNavigate } from 'react-router-dom'
-import { GAMES } from '../data/games'
+import { GAMES, gameTitle, gameTopic } from '../data/games'
 import { getScene } from '../components/scenes'
 import { PxArrow, PxClock, PxFlame, PxStar, PxUsers } from '../components/PxIcon'
 import { useLang, useT } from '../i18n/I18n'
@@ -43,8 +43,8 @@ export default function GameDetail() {
           </div>
         </div>
 
-        <span className="section-eyebrow">{t('detail.quest')} #{game.number} · {game.topic.toUpperCase()}</span>
-        <h1 style={{ color: 'var(--c-sun)' }}>{game.title}</h1>
+        <span className="section-eyebrow">{t('detail.quest')} #{game.number} · {gameTopic(game, lang).toUpperCase()}</span>
+        <h1 style={{ color: 'var(--c-sun)' }}>{gameTitle(game, lang)}</h1>
         <p className="muted mt-4" style={{ maxWidth: 720, fontSize: 24 }}>{game.tagline[lang]}</p>
 
         <div className="row mt-6">
@@ -101,8 +101,8 @@ export default function GameDetail() {
           </div>
           <div className="game-card-body" style={{ justifyContent: 'center' }}>
             <span className="game-card-no">{t('detail.quest')} #{next.number}</span>
-            <div className="game-card-title">{next.title}</div>
-            <div className="game-card-topic">{next.topic}</div>
+            <div className="game-card-title">{gameTitle(next, lang)}</div>
+            <div className="game-card-topic">{gameTopic(next, lang)}</div>
           </div>
         </Link>
       </div>

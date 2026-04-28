@@ -619,3 +619,53 @@ export const GAMES: Game[] = [
   },
 ]
 
+
+/* ============================================================
+   Localized titles & topic labels (keyed for lookup).
+   The `title` and `topic` fields above stay in English for
+   stable identity / search; helpers below pick the right
+   language for display.
+   ============================================================ */
+
+export const GAME_TITLES: Record<string, LText> = {
+  'kitchen-quest':     t('Kitchen Quest',       'Кухонный квест',          'Асүй тапсырмасы',           'Mutfak Görevi'),
+  'guess-your-gear':   t('Guess Your Gear',     'Угадай свой инвентарь',   'Құралыңды тап',             'Ekipmanını Tahmin Et'),
+  'fast-cash':         t('Fast Cash',           'Быстрые деньги',          'Жылдам ақша',               'Hızlı Para'),
+  'roll-and-write':    t('Roll & Write',        'Брось и напиши',          'Лақтыр да жаз',             'Zar At ve Yaz'),
+  'tallest-tower':     t('The Tallest Tower',   'Самая высокая башня',     'Ең биік мұнара',            'En Yüksek Kule'),
+  'academic-journey':  t('Academic Journey',    'Академический путь',      'Академиялық жол',           'Akademik Yolculuk'),
+  'speak-and-score':   t('Speak & Score',       'Говори и набирай',        'Сөйле де ұпай жина',        'Konuş ve Puan Al'),
+  'grab-it-first':     t('Grab It First!',      'Схвати первым!',          'Бірінші іліп ал!',          'Önce Kap!'),
+  'case-file-x':       t('Case File X',         'Дело №X',                 'Іс №X',                     'Dosya X'),
+  'boom-boom-clap':    t('Boom Boom Clap',      'Бум-бум-хлоп',            'Бум-бум-шапалақ',           'Boom Boom Clap'),
+  'shopping-slap':     t('Shopping Slap',       'Шоппинг-шлёп',            'Сауда-соғу',                'Alışveriş Tokadı'),
+  'trash-or-treasure': t('Trash or Treasure',   'Мусор или сокровище',     'Қоқыс па, қазына ма',       'Çöp mü Hazine mi'),
+  'tic-tac-toe':       t('Tic-Tac-Toe',         'Крестики-нолики',         'Кресттер мен нөлдер',       'X-O-X'),
+  'pyramid':           t('Pyramid',             'Пирамида',                'Пирамида',                  'Piramit'),
+  'two-truths-lie':    t('Two Truths & a Lie',  'Две правды и ложь',       'Екі шындық пен өтірік',     'İki Doğru Bir Yalan'),
+}
+
+export const TOPIC_LABELS: Record<string, LText> = {
+  'Food & Cooking': t('Food & Cooking', 'Еда и кулинария',  'Тағам және ас үй', 'Yemek ve Pişirme'),
+  'Sport':          t('Sport',          'Спорт',            'Спорт',            'Spor'),
+  'Money':          t('Money',          'Деньги',           'Ақша',             'Para'),
+  'Cinema':         t('Cinema',         'Кино',             'Кино',             'Sinema'),
+  'The Body':       t('The Body',       'Тело',             'Дене',             'Vücut'),
+  'Education':      t('Education',      'Образование',      'Білім',            'Eğitim'),
+  'House':          t('House',          'Дом',              'Үй',               'Ev'),
+  'Work':           t('Work',           'Работа',           'Жұмыс',            'İş'),
+  'Crime':          t('Crime',          'Преступление',     'Қылмыс',           'Suç'),
+  'Travel':         t('Travel',         'Путешествия',      'Саяхат',           'Seyahat'),
+  'Shopping':       t('Shopping',       'Шоппинг',          'Сауда',            'Alışveriş'),
+  'Transport':      t('Transport',      'Транспорт',        'Көлік',            'Ulaşım'),
+  'Social Media':   t('Social Media',   'Соцсети',          'Әлеуметтік желі',  'Sosyal Medya'),
+  'Relationships':  t('Relationships',  'Отношения',        'Қарым-қатынас',    'İlişkiler'),
+  'Personality':    t('Personality',    'Характер',         'Мінез',            'Kişilik'),
+}
+
+export function gameTitle(g: Game, lang: Lang): string {
+  return GAME_TITLES[g.id]?.[lang] ?? g.title
+}
+export function gameTopic(g: Game, lang: Lang): string {
+  return TOPIC_LABELS[g.topic]?.[lang] ?? g.topic
+}

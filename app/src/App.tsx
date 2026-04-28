@@ -5,19 +5,22 @@ import Games from './pages/Games'
 import GameDetail from './pages/GameDetail'
 import Manager from './pages/Manager'
 import About from './pages/About'
+import { NoiseProvider } from './components/Noise'
 
 export default function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/games" element={<Games />} />
-        <Route path="/games/:id" element={<GameDetail />} />
-        <Route path="/manager" element={<Manager />} />
-        <Route path="/about" element={<About />} />
-        <Route path="*" element={<Home />} />
-      </Routes>
-    </Layout>
+    <NoiseProvider>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/games" element={<Games />} />
+          <Route path="/games/:id" element={<GameDetail />} />
+          <Route path="/manager" element={<Manager />} />
+          <Route path="/about" element={<About />} />
+          <Route path="*" element={<Home />} />
+        </Routes>
+      </Layout>
+    </NoiseProvider>
   )
 }
 

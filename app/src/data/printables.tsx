@@ -1,19 +1,24 @@
 import type { ReactNode } from 'react'
+import type { Lang } from '../i18n/dict'
 
 /* ============================================================
    Printable templates for the Classroom Manager.
    Each renderer returns layout-ready JSX styled for A4/A5/A3.
    ============================================================ */
 
+export type LText = Record<Lang, string>
+
 export interface Printable {
   id: string
   name: string
   game: string
   meta: string
-  desc: string
+  desc: LText
   paper: 'A4' | 'A5' | 'A3' | 'A6'
   render: () => ReactNode
 }
+
+const d = (en: string, ru: string, kk: string, tr: string): LText => ({ en, ru, kk, tr })
 
 /* ---------- helpers ---------- */
 const Sheet: React.FC<{ children: ReactNode; title: string; subtitle?: string }> = ({ children, title, subtitle }) => (
@@ -61,7 +66,12 @@ const fastCashBills: Printable = {
   game: 'Fast Cash',
   meta: 'A4 · 24 bills',
   paper: 'A4',
-  desc: '24 «купюры» с экономической лексикой для распечатки и расклейки.',
+  desc: d(
+    '24 "banknotes" with economy vocabulary, ready to cut out and post around the room.',
+    '24 «купюры» с экономической лексикой для распечатки и расклейки.',
+    'Үнемдік лексикасы бар 24 «купюра» — басып шығарып, сыныпқа жапсыруға арналған.',
+    'Kesip sınıfa asmak için ekonomi kelimeleriyle 24 "banknot".',
+  ),
   render: () => (
     <Sheet title="Fast Cash · Banknotes" subtitle="Cut and stick around the classroom. Players grab the matching bill on cue.">
       <div className="print-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '10mm' }}>
@@ -95,7 +105,12 @@ const kitchenRecipes: Printable = {
   game: 'Kitchen Quest',
   meta: 'A4 · 6 cards',
   paper: 'A4',
-  desc: 'Карточки блюд для команд: название блюда + список ингредиентов + глаголы готовки.',
+  desc: d(
+    'Dish cards for teams: name + ingredient list + cooking verbs.',
+    'Карточки блюд для команд: название блюда + список ингредиентов + глаголы готовки.',
+    'Командаларға арналған тағам карталары: атау + ингредиенттер + пісіру етістіктері.',
+    'Takımlar için yemek kartları: ad + malzeme listesi + pişirme fiilleri.',
+  ),
   render: () => (
     <Sheet title="Kitchen Quest · Recipe Cards" subtitle="Hand one card per team. They must hunt the ingredients and assemble the recipe.">
       <div className="print-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8mm' }}>
@@ -133,7 +148,12 @@ const kitchenIngredients: Printable = {
   game: 'Kitchen Quest',
   meta: 'A4 · 32 cards',
   paper: 'A4',
-  desc: 'Маленькие карточки продуктов — спрятать по классу для квеста.',
+  desc: d(
+    'Small ingredient cards — hide them around the room for the quest.',
+    'Маленькие карточки продуктов — спрятать по классу для квеста.',
+    'Кішкене өнім карталары — тапсырма үшін сынып бойынша жасырыңыз.',
+    'Küçük malzeme kartları — görev için sınıfa saklayın.',
+  ),
   render: () => (
     <Sheet title="Kitchen Quest · Ingredients" subtitle="Cut and hide around the classroom. Teams must find the right ones for their recipe.">
       <div className="print-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '4mm' }}>
@@ -167,7 +187,12 @@ const gearRoleCards: Printable = {
   game: 'Guess Your Gear',
   meta: 'A4 · 30 cards',
   paper: 'A4',
-  desc: 'Карточки role/gear/place для приклеивания на спину.',
+  desc: d(
+    'Role / gear / place cards to stick on each student\'s back.',
+    'Карточки role/gear/place для приклеивания на спину.',
+    'Оқушының арқасына жапсыруға арналған role/gear/place карталары.',
+    'Her öğrencinin sırtına yapıştırmak için role/gear/place kartları.',
+  ),
   render: () => (
     <Sheet title="Guess Your Gear · Role Cards" subtitle="Stick one card on each student's back. They use Yes/No questions to discover their identity.">
       <div className="print-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '6mm' }}>
@@ -207,7 +232,12 @@ const cinemaList: Printable = {
   game: 'Roll & Write',
   meta: 'A4 · 1 sheet',
   paper: 'A4',
-  desc: 'Список киношных терминов для Roll & Write.',
+  desc: d(
+    'List of cinema terms for Roll & Write.',
+    'Список киношных терминов для Roll & Write.',
+    'Roll & Write үшін кино терминдерінің тізімі.',
+    'Roll & Write için sinema terimleri listesi.',
+  ),
   render: () => (
     <Sheet title="Roll & Write · Cinema Vocabulary" subtitle="Roll a die. On 5 or 6, grab the pen and start writing definitions.">
       <table className="word-table">
@@ -254,7 +284,12 @@ const academicBoard: Printable = {
   game: 'Academic Journey',
   meta: 'A3 · 1 board',
   paper: 'A3',
-  desc: 'Игровое поле-бродилка от kindergarten до graduation.',
+  desc: d(
+    'A board-game path from kindergarten to graduation.',
+    'Игровое поле-бродилка от kindergarten до graduation.',
+    'Kindergarten-нан graduation-ға дейінгі ойын тақтасы.',
+    'Kindergarten\'dan graduation\'a uzanan oyun tahtası.',
+  ),
   render: () => (
     <Sheet title="Academic Journey · Game Board" subtitle="Roll a die, complete tasks, survive events. The first to deliver a graduation speech wins.">
       <div className="board">
@@ -302,7 +337,12 @@ const crimeDossier: Printable = {
   game: 'Case File X',
   meta: 'A4 · 3 pages',
   paper: 'A4',
-  desc: 'Досье подозреваемых для детективного расследования.',
+  desc: d(
+    'Suspect dossiers for the detective investigation.',
+    'Досье подозреваемых для детективного расследования.',
+    'Детективтік тергеуге арналған күдіктілердің досьесі.',
+    'Dedektif soruşturması için şüpheli dosyaları.',
+  ),
   render: () => (
     <Sheet title="Case File X · Suspect Dossiers" subtitle="A painting has vanished from the Louvre. Three suspects. One thief. Find them.">
       <div className="dossier-grid">
@@ -365,7 +405,12 @@ const shoppingCards: Printable = {
   game: 'Shopping Slap',
   meta: 'A4 · 24 cards',
   paper: 'A4',
-  desc: 'Карточки товаров и категорий для шлепков.',
+  desc: d(
+    'Item and category cards for the slap game.',
+    'Карточки товаров и категорий для шлепков.',
+    'Соғу ойынына арналған өнім және санат карталары.',
+    'Tokat oyunu için ürün ve kategori kartları.',
+  ),
   render: () => (
     <Sheet title="Shopping Slap · Item Cards" subtitle="Place face-up on the table. Players slap the matching card on cue.">
       <div className="print-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '5mm' }}>
@@ -388,7 +433,12 @@ const pyramidTemplate: Printable = {
   game: 'Pyramid',
   meta: 'A4 · 1 sheet',
   paper: 'A4',
-  desc: 'Пустой шаблон пирамиды для написания слов учителем.',
+  desc: d(
+    'Blank pyramid template — fill in the words yourself.',
+    'Пустой шаблон пирамиды для написания слов учителем.',
+    'Бос пирамида шаблоны — мұғалімге сөз жазуға арналған.',
+    'Boş piramit şablonu — kelimeleri öğretmen yazar.',
+  ),
   render: () => (
     <Sheet title="Pyramid · Blank Template" subtitle="Write one word per box. Player A describes from bottom to top, player B guesses with their back turned.">
       <div className="pyramid">

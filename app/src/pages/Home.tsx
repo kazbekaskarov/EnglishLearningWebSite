@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { GAMES } from '../data/games'
+import { GAMES, gameTitle, gameTopic } from '../data/games'
 import { getScene } from '../components/scenes'
 import { PxArrow, PxBook, PxController, PxFlame, PxSpark, PxStar, PxUsers } from '../components/PxIcon'
 import { useLang, useT } from '../i18n/I18n'
@@ -316,8 +316,8 @@ export default function Home() {
                     <span className="game-card-no">{t('detail.quest')} #{g.number}</span>
                     <span className="tag green">{g.durationMin}</span>
                   </div>
-                  <div className="game-card-title">{g.title}</div>
-                  <div className="game-card-topic">{g.topic}</div>
+                  <div className="game-card-title">{gameTitle(g, lang)}</div>
+                  <div className="game-card-topic">{gameTopic(g, lang)}</div>
                   <div className="game-card-topic" style={{ fontSize: 18, opacity: 0.85 }}>{g.tagline[lang]}</div>
                 </div>
               </Link>

@@ -429,9 +429,81 @@ p, li { font-family: 'VT323', monospace; font-size: 22px; }
   border-top: 4px solid var(--c-cream);
 }
 .noise-bubble {
-  position: absolute; width: 16px; height: 16px;
+  position: absolute; width: 18px; height: 18px;
   border: 2px solid var(--c-cream);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--c-void), 0 0 8px rgba(255, 205, 117, 0.35);
 }
+
+/* ============================================================
+   Full-viewport bubble field — soap-bubble style, drift up
+   across the entire site while the noise meter is running.
+   Movement is pure CSS (GPU-friendly), React only spawns/removes.
+   ============================================================ */
+.bubble-field {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 70;
+}
+.bubble-wrap {
+  position: absolute;
+  bottom: -10vh;          /* start just below the viewport */
+  transform: translateZ(0);
+  animation-name: bubble-rise;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  will-change: transform, opacity;
+}
+.bubble {
+  display: block;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255,255,255,0.95) 0 6%, rgba(255,255,255,0.35) 14%, transparent 32%),
+    radial-gradient(circle at 70% 70%, rgba(115, 239, 247, 0.6) 0 38%, rgba(65, 166, 246, 0.45) 65%, rgba(41, 39, 76, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 0 14px rgba(115, 239, 247, 0.55),
+    inset 0 0 12px rgba(255, 255, 255, 0.4);
+  animation-name: bubble-sway;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  transform: translateX(-50%);
+  will-change: transform;
+}
+@keyframes bubble-rise {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translate3d(0, -130vh, 0); opacity: 0; }
+}
+@keyframes bubble-sway {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(calc(-50% + var(--sway, 0px))); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bubble-wrap, .bubble { animation: none !important; }
+  .bubble-wrap { display: none; }
+}
+
+/* Tiny vertical level meter on the side of the noise stage */
+.noise-meter {
+  position: absolute;
+  right: 10px; top: 10px; bottom: 36px;
+  width: 8px;
+  background: rgba(15, 16, 32, 0.6);
+  border: 2px solid var(--c-cream);
+  overflow: hidden;
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.noise-meter-fill {
+  width: 100%;
+  background: linear-gradient(to top, var(--c-leaf) 0 60%, var(--c-coral) 60% 85%, var(--c-rose) 85% 100%);
+  transition: height 80ms linear;
+}
+.noise-stage.wide .noise-meter { right: 8px; bottom: 22px; width: 6px; }
 .noise-readout {
   position: absolute; top: 12px; left: 12px;
   font-family: 'Press Start 2P', monospace; font-size: 10px;
@@ -442,6 +514,31 @@ p, li { font-family: 'VT323', monospace; font-size: 22px; }
 .noise-readout .level { color: var(--c-sun); }
 .noise-readout .level.warn { color: var(--c-coral); }
 .noise-readout .level.crit { color: var(--c-rose); }
+
+/* Widescreen / corner-pinned mode for the noise stage */
+.noise-stage.wide {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: min(560px, 70vw);
+  height: 140px;
+  z-index: 80;
+  box-shadow:
+    var(--px) var(--px) 0 var(--c-void),
+    calc(var(--px) * 2) calc(var(--px) * 2) 0 var(--c-void),
+    calc(var(--px) * 3) calc(var(--px) * 3) 0 var(--c-rose),
+    calc(var(--px) * 4) calc(var(--px) * 4) 0 var(--c-rose);
+}
+.noise-stage.wide .noise-floor { height: 14px; border-top-width: 2px; }
+.noise-stage.wide .noise-bubble { width: 12px; height: 12px; border-width: 1px; }
+.noise-stage.wide .noise-readout { font-size: 8px; padding: 4px 6px; }
+.noise-dock-btn {
+  position: absolute; top: 8px; right: 8px;
+  padding: 4px 8px !important; font-size: 9px !important;
+}
+@media (max-width: 600px) {
+  .noise-stage.wide { width: calc(100vw - 24px); right: 12px; bottom: 12px; }
+}
 
 /* Timer */
 .timer-display {

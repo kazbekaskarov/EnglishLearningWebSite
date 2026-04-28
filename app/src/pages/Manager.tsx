@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { GAMES } from '../data/games'
+import { GAMES, gameTitle, gameTopic } from '../data/games'
 import { PRINTABLES, type Printable } from '../data/printables'
 import { PxArrow, PxClock, PxDice, PxPrinter, PxSpark, PxSpeaker } from '../components/PxIcon'
-import { useT } from '../i18n/I18n'
+import { useT, useLang } from '../i18n/I18n'
+import { NoiseStage, useNoise } from '../components/Noise'
 
 type Tab = 'noise' | 'random' | 'timer' | 'flash' | 'print'
 
@@ -51,122 +52,38 @@ export default function Manager() {
 /* ============================================================ NOISE */
 function NoiseTool() {
   const t = useT()
-  const [active, setActive] = useState(false)
-  const [level, setLevel] = useState(0)
-  const [bubbles, setBubbles] = useState<{ id: number; x: number; y: number; c: string }[]>([])
-  const audioRef = useRef<{ ctx: AudioContext; analyser: AnalyserNode; data: Uint8Array; raf: number; stream: MediaStream } | null>(null)
-  const idRef = useRef(0)
-
-  useEffect(() => () => stop(), [])
-
-  async function start() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const ctx = new AudioContext()
-      const src = ctx.createMediaStreamSource(stream)
-      const analyser = ctx.createAnalyser()
-      analyser.fftSize = 512
-      src.connect(analyser)
-      const data = new Uint8Array(analyser.frequencyBinCount)
-      const tick = () => {
-        analyser.getByteTimeDomainData(data)
-        let sum = 0
-        for (let i = 0; i < data.length; i++) {
-          const v = (data[i] - 128) / 128
-          sum += v * v
-        }
-        const rms = Math.sqrt(sum / data.length)
-        const lvl = Math.min(1, rms * 6)
-        setLevel(prev => prev * 0.7 + lvl * 0.3)
-        audioRef.current!.raf = requestAnimationFrame(tick)
-      }
-      audioRef.current = { ctx, analyser, data, raf: requestAnimationFrame(tick), stream }
-      setActive(true)
-    } catch {
-      alert(t('noise.error'))
-    }
-  }
-
-  function stop() {
-    if (audioRef.current) {
-      cancelAnimationFrame(audioRef.current.raf)
-      audioRef.current.stream.getTracks().forEach(tr => tr.stop())
-      audioRef.current.ctx.close()
-      audioRef.current = null
-    }
-    setActive(false)
-    setLevel(0)
-  }
-
-  const [demo, setDemo] = useState(false)
-  useEffect(() => {
-    if (!demo) return
-    const id = setInterval(() => {
-      setLevel(l => Math.max(0, Math.min(1, l + (Math.random() - 0.5) * 0.4)))
-    }, 200)
-    return () => clearInterval(id)
-  }, [demo])
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (level > 0.05) {
-        const count = Math.floor(level * 6) + 1
-        setBubbles(prev => [
-          ...prev.slice(-40),
-          ...Array.from({ length: count }, () => ({
-            id: ++idRef.current,
-            x: Math.random() * 96 + 2,
-            y: 88,
-            c: pickColor(level),
-          })),
-        ])
-      }
-    }, 220)
-    return () => clearInterval(id)
-  }, [level])
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setBubbles(prev => prev
-        .map(b => ({ ...b, y: b.y - (1.2 + level * 3) }))
-        .filter(b => b.y > -5))
-    }, 60)
-    return () => clearInterval(id)
-  }, [level])
-
-  const status = level < 0.25 ? { text: t('noise.calm'), cls: '' }
-                : level < 0.55 ? { text: t('noise.busy'), cls: 'warn' }
-                : { text: t('noise.loud'), cls: 'crit' }
+  const {
+    active, demo, wide, sensitivity,
+    start, stop, toggleDemo, setSensitivity, setWide,
+  } = useNoise()
 
   return (
     <div className="col mt-6">
-      <div className="row" style={{ justifyContent: 'space-between' }}>
+      <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
         <h3>{t('noise.title')}</h3>
-        <div className="row">
+        <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
+          {(active || demo) && (
+            <label className="row" style={{ gap: 6, fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: 'var(--c-bone)' }}>
+              {t('noise.sens')}
+              <input
+                type="range" min={4} max={40} step={1}
+                value={sensitivity}
+                onChange={e => setSensitivity(Number(e.target.value))}
+                style={{ width: 110 }}
+              />
+            </label>
+          )}
+          <button className="pix-btn ghost sm" onClick={() => setWide(w => !w)}>
+            {wide ? t('noise.dock') : t('noise.wide')}
+          </button>
           {!active && !demo && <button className="pix-btn green sm" onClick={start}>{t('noise.mic')}</button>}
-          {!active && !demo && <button className="pix-btn ghost sm" onClick={() => setDemo(true)}>{t('noise.demo')}</button>}
-          {(active || demo) && <button className="pix-btn rose sm" onClick={() => { stop(); setDemo(false); }}>{t('noise.stop')}</button>}
+          {!active && !demo && <button className="pix-btn ghost sm" onClick={toggleDemo}>{t('noise.demo')}</button>}
+          {(active || demo) && <button className="pix-btn rose sm" onClick={() => { stop(); if (demo) toggleDemo() }}>{t('noise.stop')}</button>}
         </div>
       </div>
 
-      <div className="noise-stage">
-        <div className="noise-readout">
-          {t('noise.label')}: <span className={`level ${status.cls}`}>{status.text}</span> · {Math.round(level * 100)}%
-        </div>
-        {bubbles.map(b => (
-          <div
-            key={b.id}
-            className="noise-bubble"
-            style={{
-              left: `${b.x}%`,
-              top: `${b.y}%`,
-              background: b.c,
-              transform: `translateY(-50%)`,
-            }}
-          />
-        ))}
-        <div className="noise-floor" />
-      </div>
+      {/* Inline stage hides while widescreen overlay is active */}
+      {!wide && <NoiseStage />}
 
       <p className="muted">{t('noise.desc')}</p>
     </div>
@@ -293,6 +210,7 @@ function TimerTool() {
 /* ============================================================ FLASH */
 function FlashTool() {
   const t = useT()
+  const lang = useLang()
   const [topic, setTopic] = useState(GAMES[0].id)
   const game = GAMES.find(g => g.id === topic)!
   const deck = useMemo(() => game.vocabulary.map(w => ({ word: w, def: defOf(w) })), [game])
@@ -315,7 +233,7 @@ function FlashTool() {
           onChange={e => setTopic(e.target.value)}
           style={{ maxWidth: 280 }}
         >
-          {GAMES.map(g => <option key={g.id} value={g.id}>{g.topic} — {g.title}</option>)}
+          {GAMES.map(g => <option key={g.id} value={g.id}>{gameTopic(g, lang)} — {gameTitle(g, lang)}</option>)}
         </select>
       </div>
 
@@ -423,6 +341,7 @@ function defOf(w: string) { return MINI_DICT[w] ?? `(B1) ${w}` }
 /* ============================================================ PRINT */
 function PrintTool() {
   const t = useT()
+  const lang = useLang()
   const [active, setActive] = useState<Printable | null>(null)
 
   function doPrint(item: Printable) {
@@ -449,7 +368,7 @@ function PrintTool() {
               <span className="file-meta">{it.paper} · {it.meta.split('·')[1]?.trim() ?? ''}</span>
             </div>
             <p style={{ marginBottom: 8 }}><b style={{ color: 'var(--c-grape)' }}>{it.game}</b></p>
-            <p>{it.desc}</p>
+            <p>{it.desc[lang]}</p>
             <div className="row mt-4" style={{ gap: 8 }}>
               <button className="pix-btn coral sm" onClick={() => doPrint(it)}>
                 <PxPrinter size={14} color="#1a1c2c" /> {t('print.print')}

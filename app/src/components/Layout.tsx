@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Link, useLocation } from 'react-router-dom'
 import { PxController, PxHeart, PxStar } from './PxIcon'
 import { LangSwitcher, useT } from '../i18n/I18n'
+import { NoiseOverlay, NoiseBubbleField } from './Noise'
 
 const AUTHORS = [
   'Assel Mengdulla',
@@ -114,6 +115,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </footer>
 
       <div className="crt-overlay" />
+      <NoiseBubbleField />
+      <NoiseOverlay />
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useMemo, useState } from 'react'
-import { GAMES, type Game } from '../data/games'
+import { GAMES, gameTitle, gameTopic, type Game } from '../data/games'
 import { getScene } from '../components/scenes'
 import { useLang, useT } from '../i18n/I18n'
 
@@ -26,6 +26,8 @@ export default function Games() {
       f(g) &&
       (g.title.toLowerCase().includes(q) ||
         g.topic.toLowerCase().includes(q) ||
+        gameTitle(g, lang).toLowerCase().includes(q) ||
+        gameTopic(g, lang).toLowerCase().includes(q) ||
         g.vocabulary.some(v => v.includes(q)))
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -82,8 +84,8 @@ export default function Games() {
                   <span className="game-card-no">{t('detail.quest')} #{g.number}</span>
                   <span className="tag green">{g.durationMin}</span>
                 </div>
-                <div className="game-card-title">{g.title}</div>
-                <div className="game-card-topic">{g.topic} · {g.tagline[lang]}</div>
+                <div className="game-card-title">{gameTitle(g, lang)}</div>
+                <div className="game-card-topic">{gameTopic(g, lang)} · {g.tagline[lang]}</div>
                 <div className="game-card-meta">
                   <span className={`tag ${kindClass(g.kind)}`}>{kindLabel(g.kind)}</span>
                   <span className="tag rose">DIFF {'★'.repeat(g.difficulty)}</span>
