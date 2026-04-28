@@ -18,10 +18,7 @@ const STORAGE_KEY = 'engage.lang'
 function detect(): Lang {
   const saved = localStorage.getItem(STORAGE_KEY) as Lang | null
   if (saved && LANGS.some(l => l.code === saved)) return saved
-  const nav = navigator.language?.toLowerCase() ?? 'en'
-  if (nav.startsWith('ru')) return 'ru'
-  if (nav.startsWith('kk') || nav.startsWith('kz')) return 'kk'
-  if (nav.startsWith('tr')) return 'tr'
+  // English by default for new visitors
   return 'en'
 }
 

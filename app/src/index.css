@@ -544,6 +544,9 @@ p, li { font-family: 'VT323', monospace; font-size: 22px; }
 .printable .file-name { font-family: 'Silkscreen', monospace; font-weight: 700; font-size: 14px; }
 .printable .file-meta { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--c-grape); }
 .printable p { font-size: 18px; }
+/* Ghost button on cream printable card needs dark text to stay readable */
+.printable .pix-btn.ghost { --fg: var(--c-void); border-color: var(--c-void); }
+.printable .pix-btn.ghost:hover { background: rgba(15, 16, 32, 0.08); }
 
 /* ============================================================
    PRINTABLES — preview + print styles
