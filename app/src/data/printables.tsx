@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Lang } from '../i18n/dict'
+import { AcademicBoardSvg } from './academicBoardSvg'
 
 /* ============================================================
    Printable templates for the Classroom Manager.
@@ -257,51 +258,65 @@ const cinemaList: Printable = {
 }
 
 /* ---------- 6) ACADEMIC BOARD ---------- */
-const academicSquares = [
-  { label: 'START · Kindergarten', kind: 'start' },
-  { label: 'Make a friend',         kind: 'task' },
-  { label: 'Primary school',        kind: 'zone' },
-  { label: 'OVERSLEPT! ← back 2',   kind: 'event' },
-  { label: 'Name 3 subjects',       kind: 'task' },
-  { label: 'School trip → +1',      kind: 'event' },
-  { label: 'Secondary school',      kind: 'zone' },
-  { label: 'Pass the exam',         kind: 'task' },
-  { label: 'CAUGHT CHEATING (skip turn)', kind: 'event' },
-  { label: 'Win a scholarship → +2', kind: 'event' },
-  { label: 'College',               kind: 'zone' },
-  { label: 'Name 3 majors',         kind: 'task' },
-  { label: 'Failed an exam ← back 1', kind: 'event' },
-  { label: 'Internship → +1',       kind: 'event' },
-  { label: 'University',            kind: 'zone' },
-  { label: 'Defend your thesis',    kind: 'task' },
-  { label: 'Drop out ← back 3',     kind: 'event' },
-  { label: 'Get your degree',       kind: 'task' },
-  { label: 'GRADUATION SPEECH',     kind: 'finish' },
+/* The visual board (pink road, trees, lake, houses, task bubbles, ★ stars,
+   START / BOSS / GRADUATION badges) is rendered by AcademicBoardSvg.
+   Below we only define the deck of EVENT cards drawn whenever a player
+   lands on a yellow ★ square. */
+
+const academicEvents: string[] = [
+  'OVERSLEPT! · Skip your next turn.',
+  'TOP MARK! · Move forward 2 squares.',
+  'CAUGHT CHEATING · Go back 3 squares.',
+  'SCHOLARSHIP! · Move forward 3 squares.',
+  'FAILED THE QUIZ · Go back 2 squares.',
+  'GROUP PROJECT · Swap places with the player behind you.',
+  'TEACHER\'S PET · Take another turn.',
+  'PRINCIPAL\'S OFFICE · Skip your next turn AND answer 1 task card.',
+  'STUDY HARD · Roll the die again.',
+  'LIBRARY DAY · Pick any task square and answer it for +1 step.',
+  'FIELD TRIP · Move forward 1 square and tell the class about a real trip.',
+  'LATE BUS · Stay where you are this turn.',
 ]
+
 const academicBoard: Printable = {
   id: 'academic_board',
   name: 'academic_board.pdf',
   game: 'Academic Journey',
-  meta: 'A3 · 1 board',
+  meta: 'A3 · 1 board + event cards',
   paper: 'A3',
   desc: d(
-    'A board-game path from kindergarten to graduation.',
-    'Игровое поле-бродилка от kindergarten до graduation.',
-    'Kindergarten-нан graduation-ға дейінгі ойын тақтасы.',
-    'Kindergarten\'dan graduation\'a uzanan oyun tahtası.',
+    'A board-game path from kindergarten to graduation, with real B1 task prompts on every pink square and a deck of event cards for the yellow stars.',
+    'Игровое поле-бродилка от kindergarten до graduation: на розовых клетках — реальные B1-задания, на жёлтых звёздах — карточки событий.',
+    'Kindergarten-нан graduation-ға дейінгі ойын тақтасы: қызғылт шаршыларда — нақты B1-тапсырмалар, сары жұлдыздарда — оқиға карталары.',
+    'Kindergarten\'dan graduation\'a uzanan oyun tahtası: pembe karelerde gerçek B1 görev sorularıyla, sarı yıldızlarda olay kartı destesiyle.',
   ),
   render: () => (
-    <Sheet title="Academic Journey · Game Board" subtitle="Roll a die, complete tasks, survive events. The first to deliver a graduation speech wins.">
-      <div className="board">
-        {academicSquares.map((sq, i) => (
-          <div key={i} className={`board-square sq-${sq.kind}`}>
-            <div className="sq-num">{String(i + 1).padStart(2, '0')}</div>
-            <div className="sq-label">{sq.label}</div>
+    <Sheet
+      title="Academic Journey · Game Board"
+      subtitle="Roll a die, answer the B1 task on every pink bubble, draw an EVENT card on every ★. First to reach GRADUATION wins."
+    >
+      <div style={{ width: '100%', border: '3px solid #1a1c2c', boxShadow: '4px 4px 0 #b13e53', overflow: 'hidden' }}>
+        <AcademicBoardSvg />
+      </div>
+
+      <div style={{ marginTop: '4mm', fontSize: 11 }}>
+        <b>Legend:</b>
+        <span style={{ background:'#e83e8c', color:'#fff', padding:'1px 6px', marginLeft:'2mm', borderRadius: 10 }}>task bubble</span>
+        <span style={{ background:'#ffe066', padding:'1px 6px', marginLeft:'2mm', border:'1px solid #b13e53' }}>★ event</span>
+        <span style={{ background:'#9bd0ec', padding:'1px 6px', marginLeft:'2mm' }}>lake</span>
+        &nbsp;·&nbsp; bring tokens & one die.
+      </div>
+
+      <h3 style={{ marginTop: '8mm', fontFamily: "'Press Start 2P', monospace", fontSize: 12, color: '#b13e53' }}>
+        ★ EVENT CARDS · cut and shuffle into a deck
+      </h3>
+      <div className="print-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '4mm', marginTop: '3mm' }}>
+        {academicEvents.map((e, i) => (
+          <div key={i} className="print-card print-card-sm" style={{ background: '#fff6c9', borderStyle: 'dashed' }}>
+            <div className="print-card-title" style={{ color: '#b13e53' }}>★ EVENT #{String(i + 1).padStart(2, '0')}</div>
+            <div className="print-card-body" style={{ fontSize: 12 }}>{e}</div>
           </div>
         ))}
-      </div>
-      <div style={{ marginTop: '4mm', fontSize: 11 }}>
-        <b>Legend:</b> ⬛ task · ◆ event · ▶ start · ★ finish &nbsp;·&nbsp; bring tokens & a die.
       </div>
     </Sheet>
   ),

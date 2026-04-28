@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useSearchParams } from 'react-router-dom'
 import { GAMES, gameTitle, gameTopic } from '../data/games'
 import { PRINTABLES, type Printable } from '../data/printables'
@@ -90,14 +91,6 @@ function NoiseTool() {
   )
 }
 
-function pickColor(level: number) {
-  const palette = level < 0.3
-    ? ['#a7f070', '#73eff7', '#41a6f6']
-    : level < 0.6
-    ? ['#ffcd75', '#ef7d57', '#f4b4c5']
-    : ['#b13e53', '#ef7d57', '#ffcd75']
-  return palette[Math.floor(Math.random() * palette.length)]
-}
 
 /* ============================================================ RANDOM */
 function RandomTool() {
@@ -364,16 +357,19 @@ function PrintTool() {
         {PRINTABLES.map(it => (
           <div key={it.id} className="printable">
             <div className="file-header">
-              <span className="file-name">{it.name}</span>
+              <span className="file-name" title={it.name}>{it.name}</span>
               <span className="file-meta">{it.paper} · {it.meta.split('·')[1]?.trim() ?? ''}</span>
             </div>
-            <p style={{ marginBottom: 8 }}><b style={{ color: 'var(--c-grape)' }}>{it.game}</b></p>
-            <p>{it.desc[lang]}</p>
-            <div className="row mt-4" style={{ gap: 8 }}>
+            <span className="game-name">{it.game}</span>
+            <p className="desc">{it.desc[lang]}</p>
+            <div className="actions">
               <button className="pix-btn coral sm" onClick={() => doPrint(it)}>
                 <PxPrinter size={14} color="#1a1c2c" /> {t('print.print')}
               </button>
-              <button className="pix-btn ghost sm" onClick={() => { setActive(it); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }) }}>
+              <button
+                className="pix-btn ghost sm"
+                onClick={() => { setActive(it); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }) }}
+              >
                 {t('print.preview')}
               </button>
             </div>
@@ -401,6 +397,15 @@ function PrintTool() {
       <div className={`print-only paper-${active?.paper.toLowerCase() ?? 'a4'}`} aria-hidden="true">
         {active?.render()}
       </div>
+      {/* Portal a duplicate of the print sheet directly under <body> so it
+          escapes the .shell wrapper. The @media print rules hide .shell and
+          show only this portaled sheet — guarantees the SVG board renders. */}
+      {active && createPortal(
+        <div className={`print-portal paper-${active.paper.toLowerCase()}`} aria-hidden="true">
+          {active.render()}
+        </div>,
+        document.body,
+      )}
     </div>
   )
 }
