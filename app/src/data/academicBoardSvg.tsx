@@ -1,4 +1,4 @@
-/* ============================================================
+ /* ============================================================
    Academic Journey · printable board illustration
    Pink winding road · pine trees · cute houses · lake · lavender
    12 task bubbles + 11 ★ event stars distributed at equal
@@ -90,11 +90,20 @@ function wrapText(text: string, maxChars: number): string[] {
   return lines
 }
 
-const Bubble: React.FC<{ x: number; y: number; r: number; text: string; bg?: string; size?: number }> = ({
-  x, y, r, text, bg = '#e83e8c', size = 11,
+const Bubble: React.FC<{ x: number; y: number; r: number; text: string; bg?: string; size?: number }> = ({x, y, r, text, bg = '#e83e8c', size: initialSize = 11,
 }) => {
-  const maxChars = Math.max(10, Math.floor((r * 1.7) / (size * 0.55)))
-  const lines = wrapText(text, maxChars)
+  /* Auto-shrink the font until every wrapped line fits the bubble width.
+     Press Start 2P-like sans approx: char width ≈ size * 0.55. */
+  let size = initialSize
+  let lines: string[] = []
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const maxChars = Math.max(6, Math.floor((r * 1.7) / (size * 0.55)))
+    lines = wrapText(text, maxChars)
+    const longest = lines.reduce((m, l) => Math.max(m, l.length), 0)
+    if (longest <= maxChars) break
+    if (size <= 8) break
+    size -= 1
+  }
   const lh = size * 1.2
   const startY = y - ((lines.length - 1) * lh) / 2
   return (
@@ -119,73 +128,81 @@ const Bubble: React.FC<{ x: number; y: number; r: number; text: string; bg?: str
   )
 }
 
-const Badge: React.FC<{ x: number; y: number; r: number; label: string; icon?: ReactNode }> = ({ x, y, r, label, icon }) => (
-  <g>
-    <circle cx={x} cy={y} r={r} fill="#e83e8c" stroke="#a8285f" strokeWidth="3" />
-    <circle cx={x - r * 0.4} cy={y - r * 0.5} r={r * 0.2} fill="rgba(255,255,255,0.4)" />
-    {icon && <g transform={`translate(${x},${y - r * 0.45})`}>{icon}</g>}
-    <text
-      x={x} y={y + (icon ? r * 0.25 : 4)} textAnchor="middle"
-      fontFamily="'Press Start 2P', monospace"
-      fontSize={r * 0.32}
-      fill="#fff"
-      style={{ letterSpacing: 1 }}
-    >
-      {label}
-    </text>
-  </g>
-)
+const Badge: React.FC<{ x: number; y: number; r: number; label: string; icon?: ReactNode }> = ({ x, y, r, label, icon }) => {
+  /* Press Start 2P is ~square; total label width ≈ chars * (fontSize + letterSpacing).
+     Fit inside ~85% of badge diameter. */
+  const avail = r * 1.7
+  const maxByLen = avail / Math.max(1, label.length) - 1
+  const fontSize = Math.max(6, Math.min(r * 0.32, maxByLen))
+  return (
+    <g>
+      <circle cx={x} cy={y} r={r} fill="#e83e8c" stroke="#a8285f" strokeWidth="3" />
+      <circle cx={x - r * 0.4} cy={y - r * 0.5} r={r * 0.2} fill="rgba(255,255,255,0.4)" />
+      {icon && <g transform={`translate(${x},${y - r * 0.45})`}>{icon}</g>}
+      <text
+        x={x} y={y + (icon ? r * 0.28 : 4)} textAnchor="middle"
+        dominantBaseline="middle"
+        fontFamily="'Press Start 2P', monospace"
+        fontSize={fontSize}
+        fill="#fff"
+        style={{ letterSpacing: 1 }}
+      >
+        {label}
+      </text>
+    </g>
+  )
+}
 
 /* ---------- Road waypoints ----------
-   Just the SHAPE of the road. Bubbles & stars are placed automatically
-   at equal arc-length intervals on the section [START → BOSS]. */
+   The road is one clean serpentine from START → GRADUATION.
+   Bubbles are spread at equal arc-length on the full path.
+   BOSS sits exactly in the middle (replaces the central star). */
 
 type Pt = { x: number; y: number }
 
 const WAYPOINTS: Pt[] = [
-  { x: 90,  y: 1050 }, // 0 · START
-  { x: 250, y: 1020 },
-  { x: 450, y: 1010 },
-  { x: 620, y: 960 },
-  { x: 700, y: 860 },
-  { x: 550, y: 780 },
-  { x: 350, y: 760 },
-  { x: 180, y: 700 },
-  { x: 200, y: 580 },
-  { x: 380, y: 540 },
-  { x: 570, y: 500 },
-  { x: 660, y: 400 },
-  { x: 520, y: 320 },
-  { x: 340, y: 320 },
-  { x: 160, y: 280 },
-  { x: 200, y: 180 },
-  { x: 380, y: 150 },
-  { x: 550, y: 130 },
-  { x: 700, y: 90  }, // 18 · BOSS
-  { x: 740, y: 280 },
-  { x: 720, y: 460 },
-  { x: 740, y: 640 },
-  { x: 730, y: 820 },
-  { x: 740, y: 980 },
-  { x: 720, y: 1080 }, // 24 · GRADUATION
+  { x: 90,  y: 1060 }, // START (bottom-left)
+  { x: 240, y: 1020 },
+  { x: 420, y: 1000 },
+  { x: 600, y: 970  },
+  { x: 700, y: 870  },
+  { x: 560, y: 790  },
+  { x: 370, y: 770  },
+  { x: 180, y: 720  },
+  { x: 160, y: 600  },
+  { x: 330, y: 560  },
+  { x: 520, y: 540  },
+  { x: 680, y: 470  },
+  { x: 590, y: 360  },
+  { x: 400, y: 330  },
+  { x: 200, y: 290  },
+  { x: 180, y: 180  },
+  { x: 370, y: 150  },
+  { x: 560, y: 130  },
+  { x: 720, y: 110  }, // GRADUATION (top-right)
 ]
-const BOSS_IDX = 18
 
-/* ---------- Tasks (in narrative order, kindergarten → exams) ---------- */
+/* ---------- Tasks ----------
+   PRE_TASKS go BEFORE the BOSS checkpoint, in narrative order.
+   POST_TASKS sit BETWEEN the BOSS and the GRADUATION (the user wants
+   "Name 3 academic subjects" and "Explain the best way to REVISE"
+   after the boss). */
 
-const TASKS: { text: string; size?: number }[] = [
+const PRE_TASKS: { text: string; size?: number }[] = [
   { text: 'Explain the difference between a nursery and a kindergarten.' },
   { text: 'What are the advantages of attending a state school compared to a private school?' },
   { text: 'Give two reasons why a parent might send their child to a boarding school.' },
   { text: 'Describe the typical daily routine of primary school pupils.' },
   { text: 'What are the main responsibilities of a head teacher?' },
-  { text: 'Name 3 academic subjects where you might need to earn a degree.' },
   { text: 'Explain how a school year divided into terms differs from one divided into semesters.', size: 10 },
   { text: 'At what age do children in the UK usually start nursery, and is it compulsory?' },
-  { text: 'Explain the best way to REVISE for an exam.' },
   { text: 'Use "be allowed to" to describe a school rule.' },
   { text: 'In the US, what are the 3 levels of the school system before university?' },
   { text: 'Explain the difference between taking an exam and passing an exam.' },
+]
+const POST_TASKS: { text: string; size?: number }[] = [
+  { text: 'Name 3 academic subjects where you might need to earn a degree.' },
+  { text: 'Explain the best way to REVISE for an exam.' },
 ]
 
 /* ---------- Geometry helpers ---------- */
@@ -215,38 +232,97 @@ function pointOnPolyline(pts: Pt[], frac: number): Pt {
   return pts[pts.length - 1]
 }
 
-/** Smooth path through control points (used as the road's visible centerline). */
-function buildSmoothPath(pts: Pt[]): string {
-  if (pts.length < 2) return ''
+/** Polyline path through a list of points (used for the actual road draw,
+ *  AND for sampling marker positions — they share the exact same geometry). */
+function buildPolylinePath(pts: Pt[]): string {
+  if (pts.length === 0) return ''
   let d = `M ${pts[0].x} ${pts[0].y}`
-  for (let i = 1; i < pts.length - 1; i++) {
-    const mx = (pts[i].x + pts[i + 1].x) / 2
-    const my = (pts[i].y + pts[i + 1].y) / 2
-    d += ` Q ${pts[i].x} ${pts[i].y} ${mx} ${my}`
-  }
-  const last = pts[pts.length - 1]
-  d += ` T ${last.x} ${last.y}`
+  for (let i = 1; i < pts.length; i++) d += ` L ${pts[i].x} ${pts[i].y}`
   return d
+}
+
+/** Densify a control-point list into a smooth, corner-free polyline by
+ *  replaying SVG's Q/T algorithm: each Q segment goes from the previous
+ *  midpoint to the next midpoint, using the original waypoint as control.
+ *  The result LOOKS like a smooth bezier curve when stroked, but it's a
+ *  plain polyline so we can sample positions on it exactly. */
+function smoothPolyline(pts: Pt[], samplesPerSeg = 24): Pt[] {
+  if (pts.length < 2) return pts.slice()
+  const mid = (a: Pt, b: Pt): Pt => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 })
+  const quad = (p0: Pt, p1: Pt, p2: Pt, t: number): Pt => {
+    const u = 1 - t
+    return {
+      x: u * u * p0.x + 2 * u * t * p1.x + t * t * p2.x,
+      y: u * u * p0.y + 2 * u * t * p1.y + t * t * p2.y,
+    }
+  }
+  const out: Pt[] = [pts[0]]
+  let prevEnd: Pt = pts[0]
+  for (let i = 1; i < pts.length - 1; i++) {
+    const start = i === 1 ? pts[0] : prevEnd
+    const ctrl  = pts[i]
+    const end   = mid(pts[i], pts[i + 1])
+    for (let s = 1; s <= samplesPerSeg; s++) {
+      out.push(quad(start, ctrl, end, s / samplesPerSeg))
+    }
+    prevEnd = end
+  }
+  /* Final T segment of the SVG path is degenerate (straight line from the
+     last midpoint to the last waypoint). Sample it as a line. */
+  const last = pts[pts.length - 1]
+  for (let s = 1; s <= samplesPerSeg; s++) {
+    const t = s / samplesPerSeg
+    out.push({
+      x: prevEnd.x + (last.x - prevEnd.x) * t,
+      y: prevEnd.y + (last.y - prevEnd.y) * t,
+    })
+  }
+  return out
 }
 
 /* ---------- the printable board itself ---------- */
 
 export const AcademicBoardSvg: React.FC = () => {
-  const roadD = buildSmoothPath(WAYPOINTS)
+  /* The smoothed road & all marker positions live on the SAME dense polyline
+     — so bubbles & stars always sit exactly on the asphalt, no matter how
+     curvy the road gets. */
+  const ROAD = smoothPolyline(WAYPOINTS, 28)
+  const roadD = buildPolylinePath(ROAD)
 
-  /* Active section of the road where markers live: START..BOSS (inclusive). */
-  const activePath = WAYPOINTS.slice(0, BOSS_IDX + 1)
+  /* Slot layout along the road — every slot is one equal arc-length step:
+       0          → START
+       1..10      → PRE_TASKS  (10 bubbles)
+       11         → BOSS
+       12..13     → POST_TASKS (2 bubbles)
+       14 (= 1.0) → GRADUATION
+     ⇒ 15 markers, 14 intervals.
+     A star sits EXACTLY in the middle of EVERY interval — so the road
+     reads as a perfectly uniform alternation:
+       START ★ t1 ★ t2 ★ … ★ t10 ★ BOSS ★ t11 ★ t12 ★ GRADUATION       */
+  const PRE = PRE_TASKS.length     // 10
+  const POST = POST_TASKS.length   // 2
+  const SLOTS = PRE + POST + 2     // 14 — interval count
 
-  const N = TASKS.length // 12
-  /* Bubbles at fractions (i + 0.5)/N — strictly equal spacing, none on endpoints. */
-  const bubbles = TASKS.map((t, i) => {
-    const p = pointOnPolyline(activePath, (i + 0.5) / N)
+  const fracOf = (slot: number) => slot / SLOTS
+
+  const preBubbles = PRE_TASKS.map((t, i) => {
+    const p = pointOnPolyline(ROAD, fracOf(i + 1))
     return { ...p, ...t }
   })
-  /* Stars right between every pair of bubbles → fractions (i + 1)/N for i in [0..N-2]. */
-  const stars = Array.from({ length: N - 1 }, (_, i) =>
-    pointOnPolyline(activePath, (i + 1) / N)
+  const postBubbles = POST_TASKS.map((t, i) => {
+    const p = pointOnPolyline(ROAD, fracOf(PRE + 2 + i)) // 12, 13
+    return { ...p, ...t }
+  })
+  const bubbles = [...preBubbles, ...postBubbles]
+
+  /* One star centered in every interval between consecutive markers. */
+  const stars = Array.from({ length: SLOTS }, (_, i) =>
+    pointOnPolyline(ROAD, (i + 0.5) / SLOTS)
   )
+
+  const bossP  = pointOnPolyline(ROAD, fracOf(PRE + 1))  // 11/14
+  const gradP  = pointOnPolyline(ROAD, fracOf(SLOTS))    // 14/14 = end
+  const startP = ROAD[0]
 
   /* scattered trees — fixed positions so it prints identically every time */
   const trees: { x: number; y: number; s: number }[] = [
@@ -265,13 +341,10 @@ export const AcademicBoardSvg: React.FC = () => {
   ]
 
   const lavenders = [
-    { x: 720, y: 350 }, { x: 700, y: 540 }, { x: 740, y: 720 },
-    { x: 690, y: 920 }, { x: 60,  y: 1080 }, { x: 230, y: 1080 },
+    { x: 760, y: 240 }, { x: 740, y: 1020 }, { x: 60, y: 1080 }, { x: 230, y: 1080 },
+    { x: 60,  y: 250 }, { x: 50,  y: 700  },
   ]
 
-  const startP = WAYPOINTS[0]
-  const bossP  = WAYPOINTS[BOSS_IDX]
-  const gradP  = WAYPOINTS[WAYPOINTS.length - 1]
 
   return (
     <svg
@@ -282,21 +355,20 @@ export const AcademicBoardSvg: React.FC = () => {
     >
       {/* paper texture / soft swatches */}
       <rect x="0" y="0" width="800" height="1130" fill="#fbf3df" />
-      <ellipse cx="700" cy="180" rx="120" ry="50" fill="#e6c2dc" opacity="0.45" />
+      <ellipse cx="700" cy="220" rx="120" ry="50" fill="#e6c2dc" opacity="0.45" />
       <ellipse cx="120" cy="1030" rx="200" ry="55" fill="#e6c2dc" opacity="0.45" />
       <ellipse cx="500" cy="1090" rx="220" ry="40" fill="#c8aedc" opacity="0.45" />
 
       {/* lake (middle-left) */}
       <Lake x={300} y={870} rx={70} ry={28} />
 
-      {/* houses cluster (top middle) */}
-      <House x={380} y={70}  color="#7aa3d6" roof="#9bb6e0" />
-      <House x={440} y={75}  color="#9d6cc7" roof="#b58edc" door="#5d275d" />
-      <House x={500} y={80}  color="#7fc59f" roof="#a3dab6" />
-      <House x={560} y={75}  color="#e8a4b8" roof="#f4b4c5" />
+      {/* houses cluster — moved away from the new top-right GRADUATION */}
+      <House x={70}  y={70}  color="#7aa3d6" roof="#9bb6e0" />
+      <House x={130} y={75}  color="#9d6cc7" roof="#b58edc" door="#5d275d" />
+      <House x={70}  y={130} color="#7fc59f" roof="#a3dab6" />
 
-      {/* graduation hut (near GRADUATION) */}
-      <House x={650} y={1010} color="#b97a56" roof="#8a5a3a" door="#5d275d" />
+      {/* graduation hut (next to the new GRADUATION badge, top-right) */}
+      <House x={650} y={210} color="#b97a56" roof="#8a5a3a" door="#5d275d" />
 
       {/* trees */}
       {trees.map((t, i) => <Tree key={i} {...t} />)}
@@ -318,7 +390,7 @@ export const AcademicBoardSvg: React.FC = () => {
       {/* START / BOSS / GRADUATION badges */}
       <Badge x={startP.x} y={startP.y} r={56} label="START" />
       <Badge x={bossP.x}  y={bossP.y}  r={62} label="BOSS"       icon={<Crown x={0} y={0} />} />
-      <Badge x={gradP.x}  y={gradP.y}  r={62} label="GRADUATION" icon={<Cap   x={0} y={0} />} />
+      <Badge x={gradP.x}  y={gradP.y}  r={70} label="GRADUATION" icon={<Cap   x={0} y={0} />} />
     </svg>
   )
 }
