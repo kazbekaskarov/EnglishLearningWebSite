@@ -3,6 +3,7 @@ import { NavLink, Link, useLocation } from 'react-router-dom'
 import { PxController, PxHeart, PxStar } from './PxIcon'
 import { LangSwitcher, useT } from '../i18n/I18n'
 import { NoiseOverlay, NoiseBubbleField } from './Noise'
+import { ThemeSwitcher } from './Theme'
 
 const AUTHORS = [
   'Assel Mengdulla',
@@ -56,11 +57,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <NavLink to="/about">{t('nav.about')}</NavLink>
             <div className="nav-mobile-extras">
               <LangSwitcher />
+              <ThemeSwitcher />
             </div>
           </nav>
 
           <div className="topbar-stats">
             <LangSwitcher />
+            <ThemeSwitcher />
             <div className="hp" title="Player HP">
               <PxHeart size={16} />
               <div className="hp-track"><div className="hp-fill" style={{ width: '78%' }} /></div>

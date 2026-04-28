@@ -58,6 +58,10 @@ h1 { font-size: clamp(20px, 4.4vw, 44px); }
 h2 { font-size: clamp(16px, 2.6vw, 26px); }
 h3 { font-size: clamp(13px, 1.6vw, 18px); }
 h4 { font-size: 12px; }
+/* Smaller headings: tone down the heavy double drop-shadow so the
+   pixel font doesn't visually duplicate the word. */
+h3, h4 { text-shadow: 2px 2px 0 var(--c-void); }
+.pixel-font { text-shadow: 2px 2px 0 var(--c-void); }
 p, li { font-family: 'VT323', monospace; font-size: 22px; }
 
 /* Cards */
@@ -248,6 +252,173 @@ p, li { font-family: 'VT323', monospace; font-size: 22px; }
   color: var(--c-night);
   box-shadow: inset 0 -3px 0 var(--c-coral);
 }
+
+/* ============================================================
+   THEME TOGGLE BUTTON (sun/moon)
+   ============================================================ */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 32px; height: 30px;
+  padding: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  line-height: 1;
+  background: var(--c-night);
+  color: var(--c-sun);
+  border: 2px solid var(--c-cream);
+  box-shadow: 3px 3px 0 var(--c-void);
+  user-select: none;
+  cursor: inherit;
+  transition: transform 60ms steps(2);
+}
+.theme-toggle:hover { transform: translate(-1px, -1px); filter: brightness(1.1); }
+.theme-toggle:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--c-void); }
+.theme-toggle.theme-day { background: var(--c-sun); color: var(--c-void); }
+.theme-toggle.theme-night { color: var(--c-ice); }
+
+/* ============================================================
+   DAY THEME — light, paper-like, warm
+   Topbar / footer / marquee stay dark for brand identity.
+   ============================================================ */
+[data-theme="day"] {
+  --c-night: #f5e8c8;   /* page surface */
+  --c-deep:  #fff7d6;   /* card surface */
+  --c-bone:  #5d275d;   /* secondary muted text */
+  --c-shadow:#b89b7a;
+}
+
+/* Body & base text */
+[data-theme="day"] body {
+  background: #f5e8c8;
+  color: #1a1c2c;
+}
+[data-theme="day"] ::selection { background: #ffcd75; color: #1a1c2c; }
+
+/* Headings: lighter shadow over light surfaces */
+[data-theme="day"] h1,
+[data-theme="day"] h2,
+[data-theme="day"] h3,
+[data-theme="day"] h4,
+[data-theme="day"] .pixel-font {
+  text-shadow:
+    var(--px) var(--px) 0 #fff7d6,
+    calc(var(--px) * 2) calc(var(--px) * 2) 0 rgba(177, 62, 83, 0.35);
+}
+
+/* Hero — sunny morning gradient */
+[data-theme="day"] .hero {
+  background: linear-gradient(180deg, #ffd9a8 0%, #f5e8c8 60%, #fff7d6 100%);
+  border-bottom-color: #1a1c2c;
+}
+[data-theme="day"] .hero h1 .accent  { color: #d65a2e; }
+[data-theme="day"] .hero h1 .accent2 { color: #2c8c3a; }
+[data-theme="day"] .hero h1 .accent3 { color: #b13e53; }
+[data-theme="day"] .hero-sub { color: #5d275d; }
+[data-theme="day"] .hero-pretitle { color: #2c8c3a; }
+[data-theme="day"] .hero-pretitle::before {
+  background: #2c8c3a;
+  box-shadow: -16px 0 0 #2c8c3a, 16px 0 0 #2c8c3a;
+}
+
+/* Cards */
+[data-theme="day"] .card { color: #1a1c2c; background: #fff7d6; }
+
+/* Quote */
+[data-theme="day"] .quote { background: #fff7d6; }
+[data-theme="day"] .quote p { color: #1a1c2c; }
+[data-theme="day"] .quote .author { color: #b13e53; }
+[data-theme="day"] .quote::before,
+[data-theme="day"] .quote::after { color: #b13e53; }
+
+/* Sections */
+[data-theme="day"] .section-eyebrow { color: #b13e53; }
+[data-theme="day"] .section-eyebrow::before { color: #2c8c3a; }
+[data-theme="day"] .dither-bg {
+  background-color: #f5e8c8;
+  background-image:
+    radial-gradient(#e0c89b 1px, transparent 1px),
+    radial-gradient(#e0c89b 1px, transparent 1px);
+}
+
+/* Game cards: keep dark "screen" (it shows pixel scenes) but light body */
+[data-theme="day"] .game-card { background: #fff7d6; color: #1a1c2c; }
+[data-theme="day"] .game-card-no { color: #b13e53; }
+[data-theme="day"] .game-card-title { color: #b13e53; text-shadow: 2px 2px 0 #f5e8c8; }
+[data-theme="day"] .game-card-topic { color: #5d275d; }
+
+/* Detail */
+[data-theme="day"] .steps li { background: #fff7d6; color: #1a1c2c; }
+[data-theme="day"] .vocab-chip {
+  background: #fff7d6; color: #b13e53;
+  border-color: #1a1c2c; box-shadow: 3px 3px 0 #b13e53;
+}
+
+/* Manager tabs */
+[data-theme="day"] .tab { background: #fff7d6; color: #5d275d; }
+[data-theme="day"] .tab.active { background: #ffcd75; color: #1a1c2c; }
+
+/* Inputs */
+[data-theme="day"] .pix-input,
+[data-theme="day"] .pix-textarea {
+  background: #fff; color: #1a1c2c;
+  border-color: #1a1c2c;
+}
+[data-theme="day"] .pix-input::placeholder,
+[data-theme="day"] .pix-textarea::placeholder { color: #8a6f5a; }
+
+/* Randomizer team cards */
+[data-theme="day"] .team-card { background: #fff7d6; }
+[data-theme="day"] .team-card li { color: #1a1c2c; border-bottom-color: #c69d6c; }
+
+/* Flashcard */
+[data-theme="day"] .flashcard-side { background: #fff7d6; }
+[data-theme="day"] .flashcard-side.back { background: #ffcd75; }
+[data-theme="day"] .flashcard-word { color: #b13e53; text-shadow: 3px 3px 0 #fff; }
+[data-theme="day"] .flashcard-def { color: #1a1c2c; }
+[data-theme="day"] .fc-progress { color: #5d275d; }
+
+/* Divider */
+[data-theme="day"] .divider { color: #b13e53; }
+[data-theme="day"] .divider::before,
+[data-theme="day"] .divider::after {
+  background: repeating-linear-gradient(90deg, #b13e53 0 8px, transparent 8px 12px);
+}
+
+/* Generic .muted */
+[data-theme="day"] .muted { color: #5d275d; }
+
+/* Burger button */
+[data-theme="day"] .burger { background: #fff7d6; border-color: #1a1c2c; box-shadow: 3px 3px 0 #b13e53; }
+[data-theme="day"] .burger span { background: #b13e53; }
+
+/* Mobile nav panel — keep dark identity, no override needed */
+
+/* CRT scanlines softer in day */
+[data-theme="day"] .crt-overlay {
+  background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0 1px, transparent 1px 3px);
+}
+[data-theme="day"] .crt-overlay::after {
+  background: radial-gradient(ellipse at center, transparent 65%, rgba(93, 39, 93, 0.20) 100%);
+}
+
+/* Theme button visual swap */
+[data-theme="day"] .theme-toggle.theme-day {
+  background: #fff7d6; color: #d65a2e; border-color: #1a1c2c; box-shadow: 3px 3px 0 #b13e53;
+}
+
+/* Footer stays dark in day mode — restore light text colors locally
+   (we overrode --c-bone globally for light surfaces, which made the
+   dark footer text invisible). */
+[data-theme="day"] .footer p,
+[data-theme="day"] .footer-tagline { color: #e7d2bb; }
+[data-theme="day"] .footer-rights  { color: #a7f070; }
+[data-theme="day"] .footer-authors li { background: #1a1c2c; border-color: #f4f0e6; }
+[data-theme="day"] .footer-authors .author-name { color: #f4f0e6; }
+[data-theme="day"] .footer-authors .author-num  { color: #ef7d57; }
+[data-theme="day"] .footer-divider { color: #ffcd75; border-color: #b13e53; }
+
+/* Hero stage frame keeps the pixel SVG (sunrise scene) — looks natural in both themes */
 
 /* Hero */
 .hero {
@@ -995,3 +1166,4 @@ p, li { font-family: 'VT323', monospace; font-size: 22px; }
   letter-spacing: 1.5px;
   margin: 14px 0 6px;
 }
+

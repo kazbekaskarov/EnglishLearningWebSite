@@ -1,10 +1,10 @@
 export type Lang = 'en' | 'ru' | 'kk' | 'tr'
 
 export const LANGS: { code: Lang; label: string; flag: string }[] = [
-  { code: 'en', label: 'EN', flag: '🇬🇧' },
-  { code: 'ru', label: 'RU', flag: '🇷🇺' },
-  { code: 'kk', label: 'KZ', flag: '🇰🇿' },
-  { code: 'tr', label: 'TR', flag: '🇹🇷' },
+  { code: 'en', label: 'EN', flag: '' },
+  { code: 'ru', label: 'RU', flag: '' },
+  { code: 'kk', label: 'KZ', flag: '' },
+  { code: 'tr', label: 'TR', flag: '' },
 ]
 
 type Dict = Record<string, Record<Lang, string>>
@@ -237,6 +237,10 @@ export const T: Dict = {
   'marquee.2': { en: '15 GAMES · B1 LEVEL · CEFR', ru: '15 ИГР · УРОВЕНЬ B1 · CEFR', kk: '15 ОЙЫН · B1 ДЕҢГЕЙ · CEFR', tr: '15 OYUN · B1 SEVİYE · CEFR' },
   'marquee.3': { en: 'NO BORING DRILLS',           ru: 'НИКАКОЙ СКУЧНОЙ ЗУБРЁЖКИ', kk: 'ЖАЛЫҚТЫРАТЫН ЖАТТЫҒУ ЖОҚ', tr: 'SIKICI ALIŞTIRMA YOK' },
   'marquee.4': { en: 'POWERED BY PIXELS',          ru: 'НА ПИКСЕЛЬНОМ ДВИЖКЕ',     kk: 'ПИКСЕЛЬ ҚОЗҒАЛТҚЫШЫНДА',   tr: 'PİKSELLERLE GÜÇLÜ' },
+
+  /* ===== THEME ===== */
+  'theme.day':   { en: 'Switch to day mode',   ru: 'Включить дневной режим',  kk: 'Күндізгі режимге ауысу',  tr: 'Gündüz moduna geç' },
+  'theme.night': { en: 'Switch to night mode', ru: 'Включить ночной режим',   kk: 'Түнгі режимге ауысу',     tr: 'Gece moduna geç' },
 }
 
 export function tr(key: string, lang: Lang): string {
