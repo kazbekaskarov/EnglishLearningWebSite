@@ -1,7 +1,8 @@
 /* ============================================================
    Academic Journey · printable board illustration
    Pink winding road · pine trees · cute houses · lake · lavender
-   12 task bubbles · 6 ★ event stars · START / BOSS / GRADUATION
+   12 task bubbles + 11 ★ event stars distributed at equal
+   arc-length intervals along the road (stars sit between bubbles).
    ============================================================ */
 import type { ReactNode } from 'react'
 
@@ -70,7 +71,8 @@ const Crown: React.FC<{ x: number; y: number }> = ({ x, y }) => (
   </g>
 )
 
-/* Word-wrap a string into lines fitting roughly `maxChars` per line. */
+/* ---------- Bubble (pure-SVG text, prints reliably) ---------- */
+
 function wrapText(text: string, maxChars: number): string[] {
   const words = text.split(/\s+/)
   const lines: string[] = []
@@ -88,7 +90,6 @@ function wrapText(text: string, maxChars: number): string[] {
   return lines
 }
 
-/* Pink task bubble with multi-line text — pure SVG (prints reliably) */
 const Bubble: React.FC<{ x: number; y: number; r: number; text: string; bg?: string; size?: number }> = ({
   x, y, r, text, bg = '#e83e8c', size = 11,
 }) => {
@@ -118,7 +119,6 @@ const Bubble: React.FC<{ x: number; y: number; r: number; text: string; bg?: str
   )
 }
 
-/* Big label badge (START / BOSS / GRADUATION) */
 const Badge: React.FC<{ x: number; y: number; r: number; label: string; icon?: ReactNode }> = ({ x, y, r, label, icon }) => (
   <g>
     <circle cx={x} cy={y} r={r} fill="#e83e8c" stroke="#a8285f" strokeWidth="3" />
@@ -136,49 +136,87 @@ const Badge: React.FC<{ x: number; y: number; r: number; label: string; icon?: R
   </g>
 )
 
-/* ---------- Path nodes (in walk order) ----------
-   x in [0..800], y in [0..1130]. The road snakes through them. */
+/* ---------- Road waypoints ----------
+   Just the SHAPE of the road. Bubbles & stars are placed automatically
+   at equal arc-length intervals on the section [START → BOSS]. */
 
-type Node =
-  | { kind: 'start';    x: number; y: number }
-  | { kind: 'task';     x: number; y: number; r: number; text: string; size?: number }
-  | { kind: 'event';    x: number; y: number }
-  | { kind: 'boss';     x: number; y: number }
-  | { kind: 'grad';     x: number; y: number }
-  | { kind: 'turn';     x: number; y: number } // pure path waypoint, no marker
+type Pt = { x: number; y: number }
 
-const NODES: Node[] = [
-  { kind: 'start', x: 90,  y: 1050 },
-  { kind: 'task',  x: 230, y: 990,  r: 56, text: 'Explain the difference between a nursery and a kindergarten.' },
-  { kind: 'event', x: 380, y: 1010 },
-  { kind: 'task',  x: 540, y: 1000, r: 60, text: 'What are the advantages of attending a state school compared to a private school?' },
-  { kind: 'task',  x: 670, y: 880,  r: 60, text: 'Give two reasons why a parent might send their child to a boarding school.' },
-  { kind: 'task',  x: 470, y: 800,  r: 60, text: 'Describe the typical daily routine of primary school pupils.' },
-  { kind: 'event', x: 290, y: 790 },
-  { kind: 'task',  x: 170, y: 700,  r: 58, text: 'What are the main responsibilities of a head teacher?' },
-  { kind: 'task',  x: 340, y: 600,  r: 60, text: 'Name 3 academic subjects where you might need to earn a degree.' },
-  { kind: 'event', x: 520, y: 580 },
-  { kind: 'task',  x: 560, y: 470,  r: 62, text: 'Explain how a school year divided into terms differs from one divided into semesters.', size: 10 },
-  { kind: 'task',  x: 480, y: 370,  r: 60, text: 'At what age do children in the UK usually start nursery, and is it compulsory?' },
-  { kind: 'event', x: 300, y: 350 },
-  { kind: 'task',  x: 140, y: 280,  r: 58, text: 'Explain the best way to REVISE for an exam.' },
-  { kind: 'task',  x: 290, y: 190,  r: 58, text: 'Use "be allowed to" to describe a school rule.' },
-  { kind: 'event', x: 470, y: 170 },
-  { kind: 'task',  x: 600, y: 120,  r: 60, text: 'In the US, what are the 3 levels of the school system before university?' },
-  { kind: 'boss',  x: 720, y: 90 },
-  // road snakes back down the right side
-  { kind: 'turn',  x: 740, y: 280 },
-  { kind: 'task',  x: 720, y: 440,  r: 60, text: 'Explain the difference between taking an exam and passing an exam.' },
-  { kind: 'event', x: 740, y: 600 },
-  { kind: 'turn',  x: 730, y: 800 },
-  { kind: 'turn',  x: 740, y: 980 },
-  { kind: 'grad',  x: 720, y: 1080 },
+const WAYPOINTS: Pt[] = [
+  { x: 90,  y: 1050 }, // 0 · START
+  { x: 250, y: 1020 },
+  { x: 450, y: 1010 },
+  { x: 620, y: 960 },
+  { x: 700, y: 860 },
+  { x: 550, y: 780 },
+  { x: 350, y: 760 },
+  { x: 180, y: 700 },
+  { x: 200, y: 580 },
+  { x: 380, y: 540 },
+  { x: 570, y: 500 },
+  { x: 660, y: 400 },
+  { x: 520, y: 320 },
+  { x: 340, y: 320 },
+  { x: 160, y: 280 },
+  { x: 200, y: 180 },
+  { x: 380, y: 150 },
+  { x: 550, y: 130 },
+  { x: 700, y: 90  }, // 18 · BOSS
+  { x: 740, y: 280 },
+  { x: 720, y: 460 },
+  { x: 740, y: 640 },
+  { x: 730, y: 820 },
+  { x: 740, y: 980 },
+  { x: 720, y: 1080 }, // 24 · GRADUATION
+]
+const BOSS_IDX = 18
+
+/* ---------- Tasks (in narrative order, kindergarten → exams) ---------- */
+
+const TASKS: { text: string; size?: number }[] = [
+  { text: 'Explain the difference between a nursery and a kindergarten.' },
+  { text: 'What are the advantages of attending a state school compared to a private school?' },
+  { text: 'Give two reasons why a parent might send their child to a boarding school.' },
+  { text: 'Describe the typical daily routine of primary school pupils.' },
+  { text: 'What are the main responsibilities of a head teacher?' },
+  { text: 'Name 3 academic subjects where you might need to earn a degree.' },
+  { text: 'Explain how a school year divided into terms differs from one divided into semesters.', size: 10 },
+  { text: 'At what age do children in the UK usually start nursery, and is it compulsory?' },
+  { text: 'Explain the best way to REVISE for an exam.' },
+  { text: 'Use "be allowed to" to describe a school rule.' },
+  { text: 'In the US, what are the 3 levels of the school system before university?' },
+  { text: 'Explain the difference between taking an exam and passing an exam.' },
 ]
 
-/* Build a smooth path through node centers using quadratic curves
-   (each midpoint becomes a curve target; the previous point is the control). */
-function buildPath(nodes: Node[]): string {
-  const pts = nodes.map(n => ({ x: n.x, y: n.y }))
+/* ---------- Geometry helpers ---------- */
+
+/** Sample a point at the given fraction (0..1) of the polyline arc length. */
+function pointOnPolyline(pts: Pt[], frac: number): Pt {
+  if (pts.length === 1) return pts[0]
+  const segs: number[] = []
+  let total = 0
+  for (let i = 0; i < pts.length - 1; i++) {
+    const len = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y)
+    segs.push(len)
+    total += len
+  }
+  const target = Math.max(0, Math.min(1, frac)) * total
+  let acc = 0
+  for (let i = 0; i < segs.length; i++) {
+    if (acc + segs[i] >= target) {
+      const t = segs[i] === 0 ? 0 : (target - acc) / segs[i]
+      return {
+        x: pts[i].x + (pts[i + 1].x - pts[i].x) * t,
+        y: pts[i].y + (pts[i + 1].y - pts[i].y) * t,
+      }
+    }
+    acc += segs[i]
+  }
+  return pts[pts.length - 1]
+}
+
+/** Smooth path through control points (used as the road's visible centerline). */
+function buildSmoothPath(pts: Pt[]): string {
   if (pts.length < 2) return ''
   let d = `M ${pts[0].x} ${pts[0].y}`
   for (let i = 1; i < pts.length - 1; i++) {
@@ -194,7 +232,21 @@ function buildPath(nodes: Node[]): string {
 /* ---------- the printable board itself ---------- */
 
 export const AcademicBoardSvg: React.FC = () => {
-  const roadD = buildPath(NODES)
+  const roadD = buildSmoothPath(WAYPOINTS)
+
+  /* Active section of the road where markers live: START..BOSS (inclusive). */
+  const activePath = WAYPOINTS.slice(0, BOSS_IDX + 1)
+
+  const N = TASKS.length // 12
+  /* Bubbles at fractions (i + 0.5)/N — strictly equal spacing, none on endpoints. */
+  const bubbles = TASKS.map((t, i) => {
+    const p = pointOnPolyline(activePath, (i + 0.5) / N)
+    return { ...p, ...t }
+  })
+  /* Stars right between every pair of bubbles → fractions (i + 1)/N for i in [0..N-2]. */
+  const stars = Array.from({ length: N - 1 }, (_, i) =>
+    pointOnPolyline(activePath, (i + 1) / N)
+  )
 
   /* scattered trees — fixed positions so it prints identically every time */
   const trees: { x: number; y: number; s: number }[] = [
@@ -216,6 +268,10 @@ export const AcademicBoardSvg: React.FC = () => {
     { x: 720, y: 350 }, { x: 700, y: 540 }, { x: 740, y: 720 },
     { x: 690, y: 920 }, { x: 60,  y: 1080 }, { x: 230, y: 1080 },
   ]
+
+  const startP = WAYPOINTS[0]
+  const bossP  = WAYPOINTS[BOSS_IDX]
+  const gradP  = WAYPOINTS[WAYPOINTS.length - 1]
 
   return (
     <svg
@@ -251,27 +307,19 @@ export const AcademicBoardSvg: React.FC = () => {
       <path d={roadD} fill="none" stroke="#e83e8c" strokeWidth="40" strokeLinecap="round" strokeLinejoin="round" />
       <path d={roadD} fill="none" stroke="#ffffff" strokeWidth="2" strokeDasharray="6 12" strokeLinecap="round" />
 
-      {/* nodes (markers + bubbles) */}
-      {NODES.map((n, i) => {
-        if (n.kind === 'task') {
-          return <Bubble key={i} x={n.x} y={n.y} r={n.r} text={n.text} size={n.size} />
-        }
-        if (n.kind === 'event') {
-          return <Star key={i} x={n.x} y={n.y} s={1.2} />
-        }
-        if (n.kind === 'start') {
-          return <Badge key={i} x={n.x} y={n.y} r={56} label="START" />
-        }
-        if (n.kind === 'boss') {
-          return <Badge key={i} x={n.x} y={n.y} r={62} label="BOSS" icon={<Crown x={0} y={0} />} />
-        }
-        if (n.kind === 'grad') {
-          return <Badge key={i} x={n.x} y={n.y} r={62} label="GRADUATION" icon={<Cap x={0} y={0} />} />
-        }
-        return null
-      })}
+      {/* stars first — bubbles render on top so any tiny overlap looks clean */}
+      {stars.map((p, i) => <Star key={`st-${i}`} x={p.x} y={p.y} s={1.1} />)}
+
+      {/* task bubbles — equal arc-length spacing along the road */}
+      {bubbles.map((b, i) => (
+        <Bubble key={`b-${i}`} x={b.x} y={b.y} r={54} text={b.text} size={b.size} />
+      ))}
+
+      {/* START / BOSS / GRADUATION badges */}
+      <Badge x={startP.x} y={startP.y} r={56} label="START" />
+      <Badge x={bossP.x}  y={bossP.y}  r={62} label="BOSS"       icon={<Crown x={0} y={0} />} />
+      <Badge x={gradP.x}  y={gradP.y}  r={62} label="GRADUATION" icon={<Cap   x={0} y={0} />} />
     </svg>
   )
 }
-
 
